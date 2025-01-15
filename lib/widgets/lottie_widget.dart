@@ -28,6 +28,11 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
     animationController = AnimationController(vsync: this);
     super.initState();
   }
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

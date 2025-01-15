@@ -22,11 +22,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   SubscriptionScreenUiconfig get uiConfig =>
       widget.uiConfig ??
-      SubscriptionScreenUiconfig(features: [
-        const FeatureItem(title: "Unlimited access to all features", icon: Icons.check_circle),
-        const FeatureItem(title: "Ad-free use", icon: Icons.block),
-        const FeatureItem(title: "New features", icon: Icons.update),
-      ]);
+      SubscriptionScreenUiconfig(
+        features: [
+          const FeatureItem(title: "Unlimited access to all features", icon: Icon(Icons.check_circle)),
+          const FeatureItem(title: "Ad-free use", icon: Icon(Icons.block)),
+          const FeatureItem(title: "New features", icon: Icon(Icons.update)),
+        ],
+      );
 
   @override
   void initState() {
