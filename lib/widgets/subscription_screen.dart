@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
 import 'package:revenuecat_integration/extensions/revenuecat_theme_extension.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
-
+import 'package:revenuecat_integration/widgets/feature_item.dart';
+import '../service/revenuecat_integration_service.dart';
 import 'lottie_widget.dart';
 
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key});
-
+  const SubscriptionScreen({super.key, this.uiConfig});
+  final SubscriptionScreenUiconfig? uiConfig;
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
@@ -17,6 +19,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Package? selectedPackage;
   List<Package> packages = [];
   bool isLoading = true;
+
+  SubscriptionScreenUiconfig get uiConfig =>
+      widget.uiConfig ??
+      SubscriptionScreenUiconfig(features: [
+        const FeatureItem(title: "Unlimited access to all features", icon: Icons.check_circle),
+        const FeatureItem(title: "Ad-free use", icon: Icons.block),
+        const FeatureItem(title: "New features", icon: Icons.update),
+      ]);
 
   @override
   void initState() {
@@ -33,20 +43,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Future<void> fetchOffers() async {
     try {
-      final offerings = await Purchases.getOfferings();
-      if (offerings.current != null) {
+      final List<Package>? packages = await RevenuecatIntegrationService.instance.fetchOffers();
+      if (packages != null) {
         setState(() {
-          packages = offerings.current!.availablePackages;
+          this.packages = packages;
           isLoading = false;
-          selectedPackage = packages.firstWhere(
-            (package) => package.packageType == PackageType.annual,
-            orElse: () => packages.first,
-          );
         });
       }
     } catch (e) {
-      debugPrint('Error fetching offers: $e');
-      setState(() => isLoading = false);
+      debugPrint(e.toString());
     }
   }
 
@@ -55,26 +60,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     RevenuecatThemeExtension customTheme = Theme.of(context).extension<RevenuecatThemeExtension>()!;
 
     return Scaffold(
+      backgroundColor: uiConfig.backgroundBuilder == null ? null : Colors.transparent,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          Positioned(
-            top: 20,
-            left: 0,
-            child: Opacity(
-              opacity: 0.3,
-              child: LottieWidget(
-                asset: context.isDarkTheme ? "subscription_bg_dark_animation" : "subscription_bg_light_animation",
-                repeat: true,
-                size: const Size(300, 300),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -20,
-            right: 0,
-            child: Transform.rotate(
-              angle: 3.14,
+          if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, MediaQuery.of(context).size.height, MediaQuery.of(context).size.width),
+          if (uiConfig.backgroundBuilder == null) ...[
+            Positioned(
+              top: 20,
+              left: 0,
               child: Opacity(
                 opacity: 0.3,
                 child: LottieWidget(
@@ -84,7 +78,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 ),
               ),
             ),
-          ),
+            Positioned(
+              bottom: -20,
+              right: 0,
+              child: Transform.rotate(
+                angle: 3.14,
+                child: Opacity(
+                  opacity: 0.3,
+                  child: LottieWidget(
+                    asset: context.isDarkTheme ? "subscription_bg_dark_animation" : "subscription_bg_light_animation",
+                    repeat: true,
+                    size: const Size(300, 300),
+                  ),
+                ),
+              ),
+            ),
+          ],
 
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(
@@ -104,14 +113,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    "Bir plan seçin",
+                    uiConfig.title,
                     style: context.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Daha fazla özellik ve içerik için bir plan seçin",
+                    uiConfig.description,
                     style: context.textTheme.bodyLarge?.copyWith(
                       color: Colors.grey,
                     ),
@@ -163,6 +172,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             child: Row(
               children: [
                 Radio(
+                  activeColor: customTheme.trialText,
                   value: package,
                   groupValue: selectedPackage,
                   onChanged: (Package? value) {
@@ -183,17 +193,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         package.storeProduct.priceString,
                         style: context.textTheme.bodyLarge,
                       ),
-                      if (_getTrialDays(package) != null)
+                      if (RevenuecatIntegrationService.instance.getTrialDays(package) != null)
                         Text(
-                          _getTrialDays(package)!,
+                          RevenuecatIntegrationService.instance.getTrialDays(package)!,
                           style: TextStyle(
                             color: customTheme.trialText,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      if (_getSavePercentage(package) != null)
+                      if (RevenuecatIntegrationService.instance.getSavePercentage(package, packages) != null)
                         Text(
-                          _getSavePercentage(package)!,
+                          RevenuecatIntegrationService.instance.getSavePercentage(package, packages)!,
                           style: TextStyle(
                             color: customTheme.trialText,
                             fontWeight: FontWeight.w500,
@@ -202,7 +212,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     ],
                   ),
                 ),
-                if (_isPopular(package))
+                if (RevenuecatIntegrationService.instance.isPopular(package))
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
@@ -210,7 +220,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      "En Popüler",
+                      uiConfig.popularBadgeText,
                       style: TextStyle(
                         color: customTheme.popularBadgeText,
                         fontSize: 12,
@@ -230,34 +240,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Neleri içerir?",
+          uiConfig.includesTitle,
           style: context.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        _buildFeatureItem(Icons.check_circle, "Tüm özelliklere sınırsız erişim"),
-        _buildFeatureItem(Icons.block, "Reklamsız kullanım"),
-        _buildFeatureItem(Icons.update, "Yeni özellikler"),
+        ...uiConfig.features,
       ],
-    );
-  }
-
-  Widget _buildFeatureItem(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          Icon(icon, color: context.revenuecatThemeExtension.trialText, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: context.textTheme.bodyLarge,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -266,7 +256,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () => _handlePurchase(),
+        onPressed: () => RevenuecatIntegrationService.instance.purchase(selectedPackage!),
         style: ElevatedButton.styleFrom(
           backgroundColor: context.revenuecatThemeExtension.trialText,
           shape: RoundedRectangleBorder(
@@ -274,7 +264,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           ),
         ),
         child: Text(
-          "Satın Al",
+          uiConfig.purchaseButtonTitle,
           style: context.textTheme.titleSmall!.copyWith(color: context.revenuecatThemeExtension.popularBadgeText),
         ),
       ),
@@ -290,69 +280,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   String _getPackageTitle(Package package) {
     switch (package.packageType) {
-      case PackageType.monthly:
-        return "Aylık Plan";
-      case PackageType.annual:
-        return "Yıllık Plan";
+      case PackageType.unknown:
+        return uiConfig.packagesTextConfig.unknowPackageText;
+      case PackageType.custom:
+        return uiConfig.packagesTextConfig.customPackageText;
       case PackageType.lifetime:
-        return "Ömür Boyu Plan";
+        return uiConfig.packagesTextConfig.lifetimePackageText;
+      case PackageType.annual:
+        return uiConfig.packagesTextConfig.annualPackageText;
+      case PackageType.sixMonth:
+        return uiConfig.packagesTextConfig.sixMonthPackageText;
+      case PackageType.threeMonth:
+        return uiConfig.packagesTextConfig.threeMonthPackageText;
+      case PackageType.twoMonth:
+        return uiConfig.packagesTextConfig.twoMonthPackageText;
+      case PackageType.monthly:
+        return uiConfig.packagesTextConfig.monthlyPackageText;
+      case PackageType.weekly:
+        return uiConfig.packagesTextConfig.weeklyPackageText;
       default:
         return package.storeProduct.title;
-    }
-  }
-
-  String? _getTrialDays(Package package) {
-    final trialDuration = package.storeProduct.introductoryPrice?.periodNumberOfUnits;
-
-    if (trialDuration == null || trialDuration <= 0) {
-      return null;
-    }
-
-    return "$trialDuration günlük ücretsiz deneme";
-  }
-
-  String? _getSavePercentage(Package package) {
-    if (package.packageType == PackageType.annual) {
-      // Yıllık ve aylık paketleri bul
-      final yearlyPackage = package;
-      final monthlyPackage = packages.firstWhere(
-        (p) => p.packageType == PackageType.monthly,
-        orElse: () => package,
-      );
-
-      // Fiyatları al ve hesapla
-      final yearlyPrice = yearlyPackage.storeProduct.price;
-      final monthlyPrice = monthlyPackage.storeProduct.price;
-
-      if (monthlyPrice > 0) {
-        // Yıllık toplam = Aylık fiyat * 12 ay
-        final yearlyTotal = monthlyPrice * 12;
-        // Tasarruf yüzdesi = ((Yıllık toplam - Yıllık paket fiyatı) / Yıllık toplam) * 100
-        final savePercentage = ((yearlyTotal - yearlyPrice) / yearlyTotal * 100).round();
-
-        return "%$savePercentage tasarruf et";
-      }
-    }
-    return null;
-  }
-
-  bool _isPopular(Package package) {
-    return package.packageType == PackageType.annual;
-  }
-
-  Future<void> _handlePurchase() async {
-    if (selectedPackage == null) return;
-
-    try {
-      final purchaserInfo = await Purchases.purchasePackage(selectedPackage!);
-      if (purchaserInfo.entitlements.all['premium']?.isActive ?? false) {
-        if (context.mounted) {
-          // ignore: use_build_context_synchronously
-          Navigator.of(context).pop(true);
-        }
-      }
-    } catch (e) {
-      // Hata yönetimi
     }
   }
 }

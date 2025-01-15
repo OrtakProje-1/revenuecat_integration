@@ -5,6 +5,12 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:revenuecat_integration/models/store_config.dart';
 
 class RevenuecatIntegrationService {
+  RevenuecatIntegrationService._();
+  static  RevenuecatIntegrationService? _instance;
+  factory RevenuecatIntegrationService() => _instance ??= RevenuecatIntegrationService._();
+
+  static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
+
   final StreamController<bool> purchaseController = StreamController.broadcast();
   Stream<bool> get purchaseStream => purchaseController.stream;
 
@@ -52,7 +58,6 @@ class RevenuecatIntegrationService {
   }
 
   Future<void> purchaseCancelled() async {
-    
     // Notify the app that the purchase is cancelled
   }
 
@@ -107,3 +112,5 @@ class RevenuecatIntegrationService {
     return offerings.current!.availablePackages;
   }
 }
+
+
