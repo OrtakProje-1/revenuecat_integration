@@ -157,9 +157,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     return Column(
       children: packages.map((package) {
         final isSelected = selectedPackage == package;
-
-        return GestureDetector(
-          onTap: () => setState(() => selectedPackage = package),
+        final bool isPopular = RevenuecatIntegrationService.instance.isPopular(package);
+        final int? trialDays = RevenuecatIntegrationService.instance.getTrialDays(package);
+        final int? savePercentage = RevenuecatIntegrationService.instance.getSavePercentage(package, packages);
+        final Widget child = Banner(
+          color: isPopular ? customTheme.popularBadgeBg : Colors.transparent,
+          message: isPopular ? uiConfig.popularBadgeText : "",
+          location: BannerLocation.topStart,
+          shadow: BoxShadow(
+            color: isPopular ? Colors.black.withAlpha(100) : Colors.black.withAlpha(0),
+            blurRadius: 2,
+            offset: const Offset(0, 2),
+          ),
+          
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
@@ -191,21 +201,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        package.storeProduct.priceString,
-                        style: context.textTheme.bodyLarge,
-                      ),
-                      if (RevenuecatIntegrationService.instance.getTrialDays(package) != null)
+                      if (trialDays != null)
                         Text(
-                          RevenuecatIntegrationService.instance.getTrialDays(package)!,
+                          uiConfig.editingTrialDaysText(trialDays),
                           style: TextStyle(
                             color: customTheme.trialText,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      if (RevenuecatIntegrationService.instance.getSavePercentage(package, packages) != null)
+                      if (savePercentage != null)
                         Text(
-                          RevenuecatIntegrationService.instance.getSavePercentage(package, packages)!,
+                          uiConfig.editingSavePercentageText(savePercentage),
                           style: TextStyle(
                             color: customTheme.trialText,
                             fontWeight: FontWeight.w500,
@@ -214,24 +220,27 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     ],
                   ),
                 ),
-                if (RevenuecatIntegrationService.instance.isPopular(package))
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: customTheme.popularBadgeBg,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      uiConfig.popularBadgeText,
-                      style: TextStyle(
-                        color: customTheme.popularBadgeText,
-                        fontSize: 12,
-                      ),
-                    ),
+                Text(
+                  package.storeProduct.priceString,
+                  style: const TextStyle(
+                    fontSize: 24,
                   ),
+                ),
               ],
             ),
           ),
+        );
+        return GestureDetector(
+          onTap: () => setState(() => selectedPackage = package),
+          child: Badge(
+              label: savePercentage != null ? Text(uiConfig.editingSavePercentageText(savePercentage)) : null,
+              backgroundColor: savePercentage != null ? customTheme.popularBadgeBg : null,
+              textColor: customTheme.popularBadgeText,
+              offset: const Offset(-75, -6),
+              child: ClipRRect(
+                clipBehavior: Clip.hardEdge,
+                child: child,
+              )),
         );
       }).toList(),
     );
@@ -300,8 +309,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         return uiConfig.packagesTextConfig.monthlyPackageText;
       case PackageType.weekly:
         return uiConfig.packagesTextConfig.weeklyPackageText;
-      default:
-        return package.storeProduct.title;
     }
   }
 }

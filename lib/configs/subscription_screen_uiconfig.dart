@@ -12,6 +12,8 @@ class SubscriptionScreenUiconfig {
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
+  EditableText editingSavePercentageText;
+  EditableText editingTrialDaysText;
   SubscriptionScreenUiconfig({
     this.title = 'Choose a plan',
     this.description = 'Unlock all the features by subscribing to our service',
@@ -20,7 +22,17 @@ class SubscriptionScreenUiconfig {
     this.includesTitle = 'Includes',
     this.showFeaturesIcons = false,
     this.backgroundBuilder,
+    this.editingSavePercentageText = defaultEditingSavePercentageText,
+    this.editingTrialDaysText = defaultTrialDaysText,
     this.features = const[],
     PackagesTextConfig? packagesTextConfig,
   }) : packagesTextConfig = packagesTextConfig ?? PackagesTextConfig.defaultConfig();
+  
+}
+
+String defaultEditingSavePercentageText(int percentage) {
+  return 'Save $percentage%';
+}
+String defaultTrialDaysText(int trialDays) {
+  return 'Free $trialDays days trial';
 }

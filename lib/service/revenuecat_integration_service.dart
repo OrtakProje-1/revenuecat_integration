@@ -65,7 +65,7 @@ class RevenuecatIntegrationService {
     return package.packageType == PackageType.annual;
   }
 
-  String? getSavePercentage(Package package, List<Package> packages) {
+  int? getSavePercentage(Package package, List<Package> packages) {
     if (package.packageType == PackageType.annual) {
       // Yıllık ve aylık paketleri bul
       final yearlyPackage = package;
@@ -84,20 +84,20 @@ class RevenuecatIntegrationService {
         // Tasarruf yüzdesi = ((Yıllık toplam - Yıllık paket fiyatı) / Yıllık toplam) * 100
         final savePercentage = ((yearlyTotal - yearlyPrice) / yearlyTotal * 100).round();
 
-        return "%$savePercentage tasarruf et";
+        return savePercentage;
       }
     }
     return null;
   }
 
-  String? getTrialDays(Package package) {
+  int? getTrialDays(Package package) {
     final trialDuration = package.storeProduct.introductoryPrice?.periodNumberOfUnits;
 
     if (trialDuration == null || trialDuration <= 0) {
       return null;
     }
 
-    return "$trialDuration günlük ücretsiz deneme";
+    return trialDuration;
   }
 
   Future<List<Package>?> fetchOffers() async {
