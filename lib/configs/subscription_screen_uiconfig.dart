@@ -8,7 +8,6 @@ class SubscriptionScreenUiconfig {
   String purchaseButtonTitle;
   String popularBadgeText;
   String includesTitle;
-  bool showFeaturesIcons;
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
@@ -20,7 +19,6 @@ class SubscriptionScreenUiconfig {
     this.purchaseButtonTitle = 'Subscribe',
     this.popularBadgeText = 'Popular',
     this.includesTitle = 'Includes',
-    this.showFeaturesIcons = false,
     this.backgroundBuilder,
     this.editingSavePercentageText = defaultEditingSavePercentageText,
     this.editingTrialDaysText = defaultTrialDaysText,

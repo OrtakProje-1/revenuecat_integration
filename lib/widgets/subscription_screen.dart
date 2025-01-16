@@ -169,7 +169,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             blurRadius: 2,
             offset: const Offset(0, 2),
           ),
-          
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.all(16),
@@ -209,14 +208,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      if (savePercentage != null)
-                        Text(
-                          uiConfig.editingSavePercentageText(savePercentage),
-                          style: TextStyle(
-                            color: customTheme.trialText,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                     
                     ],
                   ),
                 ),
@@ -236,6 +228,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               label: savePercentage != null ? Text(uiConfig.editingSavePercentageText(savePercentage)) : null,
               backgroundColor: savePercentage != null ? customTheme.popularBadgeBg : null,
               textColor: customTheme.popularBadgeText,
+              isLabelVisible: savePercentage != null,
               offset: const Offset(-75, -6),
               child: ClipRRect(
                 clipBehavior: Clip.hardEdge,
