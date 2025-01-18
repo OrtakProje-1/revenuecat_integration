@@ -1,24 +1,17 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:revenuecat_integration/util/defines.dart';
 
 class StoreConfig {
   final Store store;
   final String apiKey;
-  static StoreConfig? _instance;
+  final String entitlement;
+  final TemplateType templateType;
 
-  factory StoreConfig({required Store store, required String apiKey}) {
-    _instance ??= StoreConfig._internal(store, apiKey);
-    return _instance!;
-  }
+  StoreConfig({required this.store, required this.apiKey, required this.entitlement, this.templateType = TemplateType.custom});
 
-  StoreConfig._internal(this.store, this.apiKey);
+  bool isForAppleStore() => store == Store.appStore;
 
-  static StoreConfig get instance {
-    return _instance!;
-  }
+  bool isForGooglePlay() => store == Store.playStore;
 
-  static bool isForAppleStore() => instance.store == Store.appStore;
-
-  static bool isForGooglePlay() => instance.store == Store.playStore;
-
-  static bool isForAmazonAppstore() => instance.store == Store.amazon;
+  bool isForAmazonAppstore() => store == Store.amazon;
 }

@@ -1,13 +1,20 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
+import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
 import 'package:revenuecat_integration/models/store_config.dart';
+import 'package:revenuecat_integration/util/defines.dart';
+import 'package:revenuecat_integration/util/extensions.dart';
+import 'package:revenuecat_integration/widgets/subscription_screen.dart';
 
 class RevenuecatIntegrationService {
+  late String entitlement;
+
   RevenuecatIntegrationService._();
   static RevenuecatIntegrationService? _instance;
-  factory RevenuecatIntegrationService() => _instance ??= RevenuecatIntegrationService._();
 
   static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
 
@@ -15,28 +22,25 @@ class RevenuecatIntegrationService {
   Stream<bool> get purchaseStream => purchaseController.stream;
 
   Future<void> init(StoreConfig storeConfig) async {
-    await configureSDK(storeConfig.apiKey);
-  }
-
-  Future<void> configureSDK(String apiKey) async {
-    if (apiKey.isEmpty) {
+    if (storeConfig.apiKey.isEmpty) {
       throw Exception('API key is required');
     }
+    if (storeConfig.entitlement.isEmpty) {
+      throw Exception('Entitlement is required');
+    }
+
+    entitlement = storeConfig.entitlement;
     await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.error);
     PurchasesConfiguration configuration;
-    if (StoreConfig.isForAmazonAppstore()) {
-      configuration = AmazonConfiguration(apiKey)..appUserID = null;
+    if (storeConfig.isForAmazonAppstore()) {
+      configuration = AmazonConfiguration(storeConfig.apiKey)..appUserID = null;
     } else {
-      configuration = PurchasesConfiguration(apiKey)..appUserID = null;
+      configuration = PurchasesConfiguration(storeConfig.apiKey)..appUserID = null;
     }
     await Purchases.configure(configuration);
     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
     if (customerInfo.allPurchasedProductIdentifiers.isNotEmpty) {
-      customerInfo.entitlements.all.forEach((key, value) {
-        if (value.isActive) {
-          purchaseController.sink.add(true);
-        }
-      });
+      purchaseController.sink.add(customerInfo.entitlements.all[entitlement]?.isActive ?? false);
     }
   }
 
@@ -101,7 +105,7 @@ class RevenuecatIntegrationService {
   }
 
   Future<List<Package>?> getPackages() async {
-    Offerings offerings = await Purchases.getOfferings();
+    Offerings offerings = await fetchOfferings();
 
     if (offerings.current == null) {
       throw Exception('No offerings available');
@@ -114,5 +118,16 @@ class RevenuecatIntegrationService {
 
   Future<Offerings> fetchOfferings() async {
     return await Purchases.getOfferings();
+  }
+
+  Future<PaywallResult?> goToSubscriptionPage(BuildContext context, {SubscriptionScreenUiConfig? uiConfig, TemplateType templateType = TemplateType.custom}) async {
+    if (templateType == TemplateType.defaultUI) {
+      try {
+        return await RevenueCatUI.presentPaywallIfNeeded(entitlement);
+      } catch (_) {}
+    }
+    return context.push<PaywallResult>(SubscriptionScreen(
+      uiConfig: uiConfig ?? SubscriptionScreenUiConfig(),
+    ));
   }
 }

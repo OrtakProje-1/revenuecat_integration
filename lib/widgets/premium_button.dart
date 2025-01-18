@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:revenuecat_integration/revenuecat_integration.dart';
+import 'package:revenuecat_integration/util/defines.dart';
 import 'package:revenuecat_integration/widgets/lottie_widget.dart';
-import 'package:revenuecat_integration/widgets/subscription_screen.dart';
 
 class PremiumButton extends StatelessWidget {
-  const PremiumButton({super.key});
+  final SubscriptionScreenUiConfig? uiConfig;
+  final TemplateType? templateType;
+  const PremiumButton({super.key, this.uiConfig, this.templateType});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SubscriptionScreen(),
-              ),
-            ),
+        onPressed: () => RevenuecatIntegrationService.instance.goToSubscriptionPage(context, uiConfig: uiConfig, templateType: templateType ?? TemplateType.custom),
         icon: const LottieWidget(asset: "premium"));
   }
 }

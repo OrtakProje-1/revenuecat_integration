@@ -5,6 +5,7 @@ extension BuildContextExt on BuildContext {
   Future<T?> push<T>([Widget? page, Route<T>? route]) {
     return Navigator.push<T>(this, page != null ? MaterialPageRoute(builder: (_) => page) : route!);
   }
+  
   Future<T?> pushAndRemoveUntil<T>(Widget page) {
     return Navigator.pushAndRemoveUntil<T>(this, MaterialPageRoute(builder: (_) => page), (route) => false);
   }

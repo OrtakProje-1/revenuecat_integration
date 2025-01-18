@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
 import 'package:revenuecat_integration/extensions/revenuecat_theme_extension.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
@@ -9,7 +10,7 @@ import 'lottie_widget.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key, this.uiConfig});
-  final SubscriptionScreenUiconfig? uiConfig;
+  final SubscriptionScreenUiConfig? uiConfig;
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
@@ -19,10 +20,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Package? selectedPackage;
   List<Package> packages = [];
   bool isLoading = true;
+  RevenuecatIntegrationService get service => RevenuecatIntegrationService.instance;
 
-  SubscriptionScreenUiconfig get uiConfig =>
+  SubscriptionScreenUiConfig get uiConfig =>
       widget.uiConfig ??
-      SubscriptionScreenUiconfig(
+      SubscriptionScreenUiConfig(
         features: [
           const FeatureItem(title: "Unlimited access to all features", icon: Icon(Icons.check_circle)),
           const FeatureItem(title: "Ad-free use", icon: Icon(Icons.block)),
@@ -45,7 +47,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Future<void> fetchOffers() async {
     try {
-      final List<Package>? packages = await RevenuecatIntegrationService.instance.getPackages();
+      final List<Package>? packages = await service.getPackages();
       if (packages != null) {
         setState(() {
           this.packages = packages;
@@ -132,7 +134,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   const SizedBox(height: 32),
                   _buildFeaturesList(),
                   const SizedBox(height: 24),
-                  _buildSubscribeButton(),
+                  _buildSubscribeButton(context),
                   const SizedBox(height: 16),
                   // _buildFooter(),
                 ],
@@ -145,7 +147,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             left: 16,
             child: IconButton(
               icon: Icon(Icons.close, color: customTheme.trialText),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(context, PaywallResult.cancelled),
             ),
           ),
         ],
@@ -157,9 +159,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     return Column(
       children: packages.map((package) {
         final isSelected = selectedPackage == package;
-        final bool isPopular = RevenuecatIntegrationService.instance.isPopular(package);
-        final int? trialDays = RevenuecatIntegrationService.instance.getTrialDays(package);
-        final int? savePercentage = RevenuecatIntegrationService.instance.getSavePercentage(package, packages);
+        final bool isPopular = service.isPopular(package);
+        final int? trialDays = service.getTrialDays(package);
+        final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
           color: isPopular ? customTheme.popularBadgeBg : Colors.transparent,
           message: isPopular ? uiConfig.popularBadgeText : "",
@@ -208,7 +210,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                     
                     ],
                   ),
                 ),
@@ -255,12 +256,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     );
   }
 
-  Widget _buildSubscribeButton() {
+  Widget _buildSubscribeButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () => RevenuecatIntegrationService.instance.purchase(selectedPackage!),
+        onPressed: () async {
+          try {
+            var result = await service.purchase(selectedPackage!);
+            if (!context.mounted) return;
+            Navigator.pop(context, result ? PaywallResult.purchased : PaywallResult.cancelled);
+          } catch (e) {
+            Navigator.pop(context, PaywallResult.error);
+          }
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: context.revenuecatThemeExtension.trialText,
           shape: RoundedRectangleBorder(

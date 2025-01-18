@@ -2,7 +2,7 @@ import 'package:revenuecat_integration/configs/packages_text_config.dart';
 import 'package:revenuecat_integration/util/defines.dart';
 import 'package:revenuecat_integration/widgets/feature_item.dart';
 
-class SubscriptionScreenUiconfig {
+class SubscriptionScreenUiConfig {
   String title;
   String description;
   String purchaseButtonTitle;
@@ -13,7 +13,7 @@ class SubscriptionScreenUiconfig {
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
   EditableText editingSavePercentageText;
   EditableText editingTrialDaysText;
-  SubscriptionScreenUiconfig({
+  SubscriptionScreenUiConfig({
     this.title = 'Choose a plan',
     this.description = 'Unlock all the features by subscribing to our service',
     this.purchaseButtonTitle = 'Subscribe',
