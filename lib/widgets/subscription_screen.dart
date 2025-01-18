@@ -45,7 +45,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Future<void> fetchOffers() async {
     try {
-      final List<Package>? packages = await RevenuecatIntegrationService.instance.fetchOffers();
+      final List<Package>? packages = await RevenuecatIntegrationService.instance.getPackages();
       if (packages != null) {
         setState(() {
           this.packages = packages;

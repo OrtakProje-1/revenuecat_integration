@@ -6,7 +6,7 @@ import 'package:revenuecat_integration/models/store_config.dart';
 
 class RevenuecatIntegrationService {
   RevenuecatIntegrationService._();
-  static  RevenuecatIntegrationService? _instance;
+  static RevenuecatIntegrationService? _instance;
   factory RevenuecatIntegrationService() => _instance ??= RevenuecatIntegrationService._();
 
   static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
@@ -100,7 +100,7 @@ class RevenuecatIntegrationService {
     return trialDuration;
   }
 
-  Future<List<Package>?> fetchOffers() async {
+  Future<List<Package>?> getPackages() async {
     Offerings offerings = await Purchases.getOfferings();
 
     if (offerings.current == null) {
@@ -111,6 +111,8 @@ class RevenuecatIntegrationService {
     }
     return offerings.current!.availablePackages;
   }
+
+  Future<Offerings> fetchOfferings() async {
+    return await Purchases.getOfferings();
+  }
 }
-
-
