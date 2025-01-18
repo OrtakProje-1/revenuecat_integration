@@ -11,7 +11,7 @@ import 'package:revenuecat_integration/util/extensions.dart';
 import 'package:revenuecat_integration/widgets/subscription_screen.dart';
 
 class RevenuecatIntegrationService {
-  late String entitlement;
+  String entitlement = "";
 
   RevenuecatIntegrationService._();
   static RevenuecatIntegrationService? _instance;
