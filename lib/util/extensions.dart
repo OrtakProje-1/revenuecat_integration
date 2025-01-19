@@ -26,3 +26,8 @@ extension StringExt on String {
   bool get isPassword => RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$').hasMatch(this);
 }
 
+extension ObjectExt on Object?{
+  bool get isNull => this == null;
+  bool get isNotNull => this != null;
+}
+

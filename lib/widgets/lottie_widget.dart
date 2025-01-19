@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:revenuecat_integration/models/lottie_widget_config.dart';
+import 'package:revenuecat_integration/util/extensions.dart';
 
 class LottieWidget extends StatefulWidget {
   final LottieWidgetConfig config;
@@ -28,10 +29,18 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
     super.dispose();
   }
 
+  String get path {
+    if (widget.config.asset.isNotNull) {
+      return (widget.config.package ?? "").isNotEmpty ? "packages/${widget.config.package}/${widget.config.asset}" : widget.config.asset!;
+    } else {
+      return "packages/revenuecat_integration/assets/animations/premium.json";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Lottie.asset(
-      (widget.config.package ?? "").isNotEmpty ? "packages/${widget.config.package}/${widget.config.asset}" : widget.config.asset,
+      path,
       fit: BoxFit.cover,
       width: widget.config.size.width,
       height: widget.config.size.height,
