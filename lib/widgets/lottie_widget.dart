@@ -38,7 +38,7 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     
     return Lottie.asset(
-      "assets/animation/${widget.asset}.json",
+      "assets/animations/${widget.asset}.json",
       fit: BoxFit.cover,
       width: widget.size.width,
       height: widget.size.height,

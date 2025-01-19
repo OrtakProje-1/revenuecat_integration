@@ -8,4 +8,4 @@ export 'package:revenuecat_integration/service/revenuecat_integration_service.da
 export 'package:revenuecat_integration/widgets/premium_button.dart';
 export 'package:revenuecat_integration/widgets/subscription_screen.dart';
 export 'package:revenuecat_integration/widgets/feature_item.dart';
-
+export 'package:purchases_flutter/purchases_flutter.dart';

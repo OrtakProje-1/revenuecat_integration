@@ -4,4 +4,4 @@ typedef SubscriptionScreenBackgroundBuilder = Widget Function(BuildContext conte
 
 typedef EditableText = String Function(int value);
 
-enum TemplateType { custom, defaultUI }
+enum DesignTemplateType { custom, defaultUI }

@@ -5,9 +5,9 @@ class StoreConfig {
   final Store store;
   final String apiKey;
   final String entitlement;
-  final TemplateType templateType;
+  final DesignTemplateType templateType;
 
-  StoreConfig({required this.store, required this.apiKey, required this.entitlement, this.templateType = TemplateType.custom});
+  StoreConfig({required this.store, required this.apiKey, required this.entitlement, this.templateType = DesignTemplateType.custom});
 
   bool isForAppleStore() => store == Store.appStore;
 

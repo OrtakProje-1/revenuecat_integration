@@ -5,13 +5,13 @@ import 'package:revenuecat_integration/widgets/lottie_widget.dart';
 
 class PremiumButton extends StatelessWidget {
   final SubscriptionScreenUiConfig? uiConfig;
-  final TemplateType? templateType;
+  final DesignTemplateType? templateType;
   const PremiumButton({super.key, this.uiConfig, this.templateType});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        onPressed: () => RevenuecatIntegrationService.instance.goToSubscriptionPage(context, uiConfig: uiConfig, templateType: templateType ?? TemplateType.custom),
+        onPressed: () => RevenuecatIntegrationService.instance.goToSubscriptionPage(context, uiConfig: uiConfig, templateType: templateType ?? DesignTemplateType.custom),
         icon: const LottieWidget(asset: "premium"));
   }
 }

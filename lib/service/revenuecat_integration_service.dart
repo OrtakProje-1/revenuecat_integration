@@ -18,8 +18,8 @@ class RevenuecatIntegrationService {
 
   static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
 
-  final StreamController<bool> purchaseController = StreamController.broadcast();
-  Stream<bool> get purchaseStream => purchaseController.stream;
+  final StreamController<bool> _purchaseController = StreamController.broadcast();
+  Stream<bool> get purchaseStream => _purchaseController.stream;
 
   Future<void> init(StoreConfig storeConfig) async {
     if (storeConfig.apiKey.isEmpty) {
@@ -39,9 +39,7 @@ class RevenuecatIntegrationService {
     }
     await Purchases.configure(configuration);
     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-    if (customerInfo.allPurchasedProductIdentifiers.isNotEmpty) {
-      purchaseController.sink.add(customerInfo.entitlements.all[entitlement]?.isActive ?? false);
-    }
+    _purchaseController.sink.add(customerInfo.entitlements.all[entitlement]?.isActive ?? false);
   }
 
   Future<bool> purchase(Package package, {String? entitlementKey = "premium"}) async {
@@ -70,25 +68,38 @@ class RevenuecatIntegrationService {
   }
 
   int? getSavePercentage(Package package, List<Package> packages) {
-    if (package.packageType == PackageType.annual) {
-      // Yıllık ve aylık paketleri bul
-      final yearlyPackage = package;
-      final monthlyPackage = packages.firstWhere(
-        (p) => p.packageType == PackageType.monthly,
-        orElse: () => package,
-      );
+    int months = 0;
 
-      // Fiyatları al ve hesapla
-      final yearlyPrice = yearlyPackage.storeProduct.price;
+    switch (package.packageType) {
+      case PackageType.annual:
+        months = 12;
+        break;
+      case PackageType.sixMonth:
+        months = 6;
+        break;
+      case PackageType.threeMonth:
+        months = 3;
+        break;
+      case PackageType.twoMonth:
+        months = 2;
+        break;
+      default:
+        return null;
+    }
+
+    if (package.packageType == PackageType.annual) {
+      final monthlyPackage = packages.firstWhereOrNull((p) => p.packageType == PackageType.monthly);
+
+      if (monthlyPackage == null) return null;
+
+      final packagePrice = package.storeProduct.price;
       final monthlyPrice = monthlyPackage.storeProduct.price;
 
       if (monthlyPrice > 0) {
-        // Yıllık toplam = Aylık fiyat * 12 ay
-        final yearlyTotal = monthlyPrice * 12;
-        // Tasarruf yüzdesi = ((Yıllık toplam - Yıllık paket fiyatı) / Yıllık toplam) * 100
-        final savePercentage = ((yearlyTotal - yearlyPrice) / yearlyTotal * 100).round();
+        final totalMonthlyCost = monthlyPrice * months;
+        final discountPercentage = ((totalMonthlyCost - packagePrice) / totalMonthlyCost * 100).round();
 
-        return savePercentage;
+        return discountPercentage;
       }
     }
     return null;
@@ -120,8 +131,8 @@ class RevenuecatIntegrationService {
     return await Purchases.getOfferings();
   }
 
-  Future<PaywallResult?> goToSubscriptionPage(BuildContext context, {SubscriptionScreenUiConfig? uiConfig, TemplateType templateType = TemplateType.custom}) async {
-    if (templateType == TemplateType.defaultUI) {
+  Future<PaywallResult?> goToSubscriptionPage(BuildContext context, {SubscriptionScreenUiConfig? uiConfig, DesignTemplateType templateType = DesignTemplateType.custom}) async {
+    if (templateType == DesignTemplateType.defaultUI) {
       try {
         return await RevenueCatUI.presentPaywallIfNeeded(entitlement);
       } catch (_) {}

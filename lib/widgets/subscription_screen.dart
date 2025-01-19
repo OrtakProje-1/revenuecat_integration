@@ -51,6 +51,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       if (packages != null) {
         setState(() {
           this.packages = packages;
+          selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual);
           isLoading = false;
         });
       }
@@ -61,14 +62,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    RevenuecatThemeExtension customTheme = Theme.of(context).extension<RevenuecatThemeExtension>()!;
+    var size = MediaQuery.sizeOf(context);
+    var theme = Theme.of(context);
+    RevenuecatThemeExtension customTheme = theme.extension<RevenuecatThemeExtension>() ?? (theme.brightness == Brightness.light ? RevenuecatThemeExtension.light : RevenuecatThemeExtension.dark);
 
     return Scaffold(
       backgroundColor: uiConfig.backgroundBuilder == null ? null : Colors.transparent,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, MediaQuery.of(context).size.height, MediaQuery.of(context).size.width),
+          if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
           if (uiConfig.backgroundBuilder == null) ...[
             Positioned(
               top: 20,
@@ -261,15 +264,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
-        onPressed: () async {
-          try {
-            var result = await service.purchase(selectedPackage!);
-            if (!context.mounted) return;
-            Navigator.pop(context, result ? PaywallResult.purchased : PaywallResult.cancelled);
-          } catch (e) {
-            Navigator.pop(context, PaywallResult.error);
-          }
-        },
+        onPressed: selectedPackage == null
+            ? null
+            : () async {
+                try {
+                  var result = await service.purchase(selectedPackage!);
+                  if (!context.mounted) return;
+                  Navigator.pop(context, result ? PaywallResult.purchased : PaywallResult.cancelled);
+                } catch (e) {
+                  Navigator.pop(context, PaywallResult.error);
+                }
+              },
         style: ElevatedButton.styleFrom(
           backgroundColor: context.revenuecatThemeExtension.trialText,
           shape: RoundedRectangleBorder(
