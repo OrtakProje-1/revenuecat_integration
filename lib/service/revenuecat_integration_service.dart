@@ -18,9 +18,23 @@ class RevenuecatIntegrationService {
 
   static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
 
-  final StreamController<bool> _purchaseController = StreamController.broadcast();
-  Stream<bool> get purchaseStream => _purchaseController.stream;
+  final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
 
+  /// Initialize the RevenueCat integration service.
+  ///
+  /// Throws [Exception] if the provided [StoreConfig] is invalid.
+  ///
+  /// [StoreConfig.apiKey] and [StoreConfig.entitlement] are required.
+  ///
+  /// If [StoreConfig.isForAmazonAppstore] is true, [Purchases.configure] is called with
+  /// [AmazonConfiguration].
+  ///
+  /// Otherwise, [Purchases.configure] is called with [PurchasesConfiguration].
+  ///
+  /// The value of [isPremium] is set based on the customer's entitlement to the
+  /// provided [entitlement].
+  ///
+  /// This method must be called before any other methods in this class.
   Future<void> init(StoreConfig storeConfig) async {
     if (storeConfig.apiKey.isEmpty) {
       throw Exception('API key is required');
@@ -39,12 +53,13 @@ class RevenuecatIntegrationService {
     }
     await Purchases.configure(configuration);
     CustomerInfo customerInfo = await Purchases.getCustomerInfo();
-    _purchaseController.sink.add(customerInfo.entitlements.all[entitlement]?.isActive ?? false);
+    isPremium.value = customerInfo.entitlements.all[entitlement]?.isActive ?? false;
   }
 
   Future<bool> purchase(Package package, {String? entitlementKey = "premium"}) async {
     final purchaserInfo = await Purchases.purchasePackage(package);
-    return purchaserInfo.entitlements.all[entitlementKey]?.isActive ?? false;
+    isPremium.value = purchaserInfo.entitlements.all[entitlementKey]?.isActive ?? false;
+    return isPremium.value;
   }
 
   Future<void> restore() async {
