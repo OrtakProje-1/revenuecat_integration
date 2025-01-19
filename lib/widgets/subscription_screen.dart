@@ -63,8 +63,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
-    var theme = Theme.of(context);
-    RevenuecatThemeExtension customTheme = theme.extension<RevenuecatThemeExtension>() ?? (theme.brightness == Brightness.light ? RevenuecatThemeExtension.light : RevenuecatThemeExtension.dark);
+    RevenuecatThemeExtension customTheme = context.revenuecatThemeExtension;
 
     return Scaffold(
       backgroundColor: uiConfig.backgroundBuilder == null ? null : Colors.transparent,

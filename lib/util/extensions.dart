@@ -12,7 +12,7 @@ extension BuildContextExt on BuildContext {
 
   bool get isDarkTheme => Theme.of(this).brightness == Brightness.dark;
   TextTheme get textTheme => Theme.of(this).textTheme;
-  RevenuecatThemeExtension get revenuecatThemeExtension => Theme.of(this).extension<RevenuecatThemeExtension>()!;
+  RevenuecatThemeExtension get revenuecatThemeExtension => Theme.of(this).extension<RevenuecatThemeExtension>() ?? (isDarkTheme ? RevenuecatThemeExtension.dark : RevenuecatThemeExtension.light);
 }
 
 extension NumExt on num {
