@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
-import 'package:revenuecat_integration/extensions/revenuecat_theme_extension.dart';
 import 'package:revenuecat_integration/models/lottie_widget_config.dart';
+import 'package:revenuecat_integration/models/revenuecat_integration_theme.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
 import 'package:revenuecat_integration/widgets/feature_item.dart';
 import '../service/revenuecat_integration_service.dart';
 import '../widgets/lottie_widget.dart';
 
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key, this.uiConfig});
   final SubscriptionScreenUiConfig? uiConfig;
+  final RevenuecatIntegrationTheme? theme;
+  const SubscriptionScreen({super.key, this.uiConfig, this.theme});
+
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
@@ -21,8 +23,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Package? selectedPackage;
   List<Package> packages = [];
   bool isLoading = true;
-  RevenuecatIntegrationService get service => RevenuecatIntegrationService.instance;
 
+  RevenuecatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenuecatIntegrationTheme.dark : RevenuecatIntegrationTheme.light);
+  RevenuecatIntegrationService get service => RevenuecatIntegrationService.instance;
   SubscriptionScreenUiConfig get uiConfig =>
       widget.uiConfig ??
       SubscriptionScreenUiConfig(
@@ -64,7 +67,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
-    RevenuecatThemeExtension customTheme = context.revenuecatThemeExtension;
     var lottieAsset = context.isDarkTheme ? "subscription_bg_dark_animation.json" : "subscription_bg_light_animation.json";
 
     return Scaffold(
@@ -129,7 +131,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     ),
                   ),
                   const SizedBox(height: 32),
-                  _buildPackageCards(customTheme),
+                  _buildPackageCards(),
                   const SizedBox(height: 32),
                   _buildFeaturesList(),
                   const SizedBox(height: 24),
@@ -144,7 +146,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             top: 48, // Safe area için üstten boşluk
             left: 16,
             child: IconButton(
-              icon: Icon(Icons.close, color: customTheme.trialText),
+              icon: Icon(Icons.close, color: theme.trialText),
               onPressed: () => Navigator.pop(context, PaywallResult.cancelled),
             ),
           ),
@@ -153,7 +155,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     );
   }
 
-  Widget _buildPackageCards(RevenuecatThemeExtension customTheme) {
+  Widget _buildPackageCards() {
     return Column(
       children: packages.map((package) {
         var isDisabled = package.identifier == service.activePackageIdentifier;
@@ -162,7 +164,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         final int? trialDays = service.getTrialDays(package);
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
-          color: isPopular ? customTheme.popularBadgeBg : Colors.transparent,
+          color: isPopular ? theme.popularBadgeBg : Colors.transparent,
           message: isPopular ? uiConfig.popularBadgeText : "",
           location: BannerLocation.topEnd,
           shadow: BoxShadow(
@@ -174,10 +176,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.only(bottom: 16, left: 16, right: 32, top: 16),
             decoration: BoxDecoration(
-              color: isSelected ? customTheme.packageSelectedBg : customTheme.packageUnselectedBg,
+              color: isSelected ? theme.packageSelectedBg : theme.packageUnselectedBg,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? customTheme.packageBorderColor : Colors.transparent,
+                color: isSelected ? theme.packageBorderColor : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -185,7 +187,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               children: [
                 if (!isDisabled)
                   Radio(
-                    activeColor: customTheme.trialText,
+                    activeColor: theme.trialText,
                     value: package,
                     groupValue: selectedPackage,
                     onChanged: (Package? value) {
@@ -206,7 +208,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         Text(
                           uiConfig.editingTrialDaysText(trialDays),
                           style: TextStyle(
-                            color: customTheme.trialText,
+                            color: theme.trialText,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -216,7 +218,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 if (isDisabled)
                   Card(
                     elevation: 0,
-                    color: customTheme.packageBorderColor,
+                    color: theme.packageBorderColor,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: Text(uiConfig.activePackageText),
@@ -237,8 +239,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           onTap: isDisabled ? null : () => setState(() => selectedPackage = package),
           child: Badge(
               label: savePercentage != null ? Text(uiConfig.editingSavePercentageText(savePercentage)) : null,
-              backgroundColor: savePercentage != null ? customTheme.popularBadgeBg : null,
-              textColor: customTheme.popularBadgeText,
+              backgroundColor: savePercentage != null ? theme.popularBadgeBg : null,
+              textColor: theme.popularBadgeText,
               isLabelVisible: savePercentage != null,
               alignment: Alignment.topLeft,
               offset: const Offset(18, -8),
@@ -282,14 +284,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 }
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: context.revenuecatThemeExtension.trialText,
+          backgroundColor: theme.trialText,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: Text(
           uiConfig.purchaseButtonTitle,
-          style: context.textTheme.titleSmall!.copyWith(color: context.revenuecatThemeExtension.popularBadgeText),
+          style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
         ),
       ),
     );

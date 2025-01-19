@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
+import 'package:revenuecat_integration/models/revenuecat_integration_theme.dart';
 import 'package:revenuecat_integration/models/store_config.dart';
 import 'package:revenuecat_integration/util/defines.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
@@ -149,13 +150,15 @@ class RevenuecatIntegrationService {
     return await Purchases.getOfferings();
   }
 
-  Future<PaywallResult?> goToSubscriptionPage(BuildContext context, {SubscriptionScreenUiConfig? uiConfig, DesignTemplateType templateType = DesignTemplateType.custom}) async {
+  Future<PaywallResult?> goToSubscriptionPage(BuildContext context,
+      {SubscriptionScreenUiConfig? uiConfig, RevenuecatIntegrationTheme? theme, DesignTemplateType templateType = DesignTemplateType.custom}) async {
     if (templateType == DesignTemplateType.defaultUI) {
       try {
         return await RevenueCatUI.presentPaywallIfNeeded(entitlement);
       } catch (_) {}
     }
-    return context.push<PaywallResult>(SubscriptionScreen(
+    return await context.push<PaywallResult>(SubscriptionScreen(
+      theme: theme,
       uiConfig: uiConfig ?? SubscriptionScreenUiConfig(),
     ));
   }

@@ -1,7 +1,6 @@
-// Custom theme extension for subscription screen
 import 'package:flutter/material.dart';
 
-class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> {
+class RevenuecatIntegrationTheme {
   final Color packageSelectedBg;
   final Color packageUnselectedBg;
   final Color packageBorderColor;
@@ -10,7 +9,7 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
   final Color trialText;
   final Color saveText;
 
-  RevenuecatThemeExtension({
+  RevenuecatIntegrationTheme({
     required this.packageSelectedBg,
     required this.packageUnselectedBg,
     required this.packageBorderColor,
@@ -20,9 +19,9 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
     required this.saveText,
   });
 
-  static final light = RevenuecatThemeExtension(
-    packageSelectedBg: const Color(0xffffea00).withOpacity(0.16),
-    packageUnselectedBg: const Color(0xffffea00).withOpacity(0.08),
+  static final light = RevenuecatIntegrationTheme(
+    packageSelectedBg: const Color(0xffffea00).withAlpha(40),
+    packageUnselectedBg: const Color(0xffffea00).withAlpha(20),
     packageBorderColor: const Color(0xffe68816),
     popularBadgeBg: const Color(0xffe68816),
     popularBadgeText: Colors.white,
@@ -30,7 +29,7 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
     saveText: const Color(0xffffea00),
   );
 
-  static final dark = RevenuecatThemeExtension(
+  static final dark = RevenuecatIntegrationTheme(
     packageSelectedBg: Colors.blue.shade900,
     packageUnselectedBg: Colors.grey.shade900,
     packageBorderColor: Colors.blue,
@@ -40,9 +39,7 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
     saveText: Colors.orange,
   );
 
-  @override
-  ThemeExtension<RevenuecatThemeExtension> copyWith({
-  
+  RevenuecatIntegrationTheme copyWith({
     Color? packageSelectedBg,
     Color? packageUnselectedBg,
     Color? packageBorderColor,
@@ -51,7 +48,7 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
     Color? trialText,
     Color? saveText,
   }) {
-    return RevenuecatThemeExtension(
+    return RevenuecatIntegrationTheme(
       packageSelectedBg: packageSelectedBg ?? this.packageSelectedBg,
       packageUnselectedBg: packageUnselectedBg ?? this.packageUnselectedBg,
       packageBorderColor: packageBorderColor ?? this.packageBorderColor,
@@ -62,13 +59,12 @@ class RevenuecatThemeExtension extends ThemeExtension<RevenuecatThemeExtension> 
     );
   }
 
-  @override
-  ThemeExtension<RevenuecatThemeExtension> lerp(
-    ThemeExtension<RevenuecatThemeExtension>? other,
+  RevenuecatIntegrationTheme lerp(
+    RevenuecatIntegrationTheme? other,
     double t,
   ) {
-    if (other is! RevenuecatThemeExtension) return this;
-    return RevenuecatThemeExtension(
+    if (other is! RevenuecatIntegrationTheme) return this;
+    return RevenuecatIntegrationTheme(
       packageSelectedBg: Color.lerp(packageSelectedBg, other.packageSelectedBg, t)!,
       packageUnselectedBg: Color.lerp(packageUnselectedBg, other.packageUnselectedBg, t)!,
       packageBorderColor: Color.lerp(packageBorderColor, other.packageBorderColor, t)!,
