@@ -37,7 +37,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   void initState() {
     _animationController = AnimationController(vsync: this);
     super.initState();
-    fetchOffers();
+    fetchPackages();
   }
 
   @override
@@ -46,7 +46,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     super.dispose();
   }
 
-  Future<void> fetchOffers() async {
+  Future<void> fetchPackages() async {
     try {
       final List<Package>? packages = await service.getPackages();
       if (packages != null) {
@@ -100,11 +100,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           ],
 
           SingleChildScrollView(
+            clipBehavior: Clip.none,
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -132,8 +133,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   const SizedBox(height: 32),
                   _buildFeaturesList(),
                   const SizedBox(height: 24),
-                  _buildSubscribeButton(context),
-                  const SizedBox(height: 16),
+                  _buildSubscribeButton(context)
                   // _buildFooter(),
                 ],
               ),
@@ -156,6 +156,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Widget _buildPackageCards(RevenuecatThemeExtension customTheme) {
     return Column(
       children: packages.map((package) {
+        var isDisabled = package.identifier == service.activePackageIdentifier;
         final isSelected = selectedPackage == package;
         final bool isPopular = service.isPopular(package);
         final int? trialDays = service.getTrialDays(package);
@@ -163,7 +164,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         final Widget child = Banner(
           color: isPopular ? customTheme.popularBadgeBg : Colors.transparent,
           message: isPopular ? uiConfig.popularBadgeText : "",
-          location: BannerLocation.topStart,
+          location: BannerLocation.topEnd,
           shadow: BoxShadow(
             color: isPopular ? Colors.black.withAlpha(100) : Colors.black.withAlpha(0),
             blurRadius: 2,
@@ -171,7 +172,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           ),
           child: Container(
             margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(bottom: 16, left: 16, right: 32, top: 16),
             decoration: BoxDecoration(
               color: isSelected ? customTheme.packageSelectedBg : customTheme.packageUnselectedBg,
               borderRadius: BorderRadius.circular(16),
@@ -182,14 +183,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             ),
             child: Row(
               children: [
-                Radio(
-                  activeColor: customTheme.trialText,
-                  value: package,
-                  groupValue: selectedPackage,
-                  onChanged: (Package? value) {
-                    setState(() => selectedPackage = value);
-                  },
-                ),
+                if (!isDisabled)
+                  Radio(
+                    activeColor: customTheme.trialText,
+                    value: package,
+                    groupValue: selectedPackage,
+                    onChanged: (Package? value) {
+                      setState(() => selectedPackage = value);
+                    },
+                  ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,18 +213,28 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     ],
                   ),
                 ),
-                Text(
-                  package.storeProduct.priceString,
-                  style: const TextStyle(
-                    fontSize: 24,
+                if (isDisabled)
+                  Card(
+                    elevation: 0,
+                    color: customTheme.packageBorderColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Text(uiConfig.activePackageText),
+                    ),
+                  )
+                else
+                  Text(
+                    package.storeProduct.priceString,
+                    style: const TextStyle(
+                      fontSize: 24,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
         );
         return GestureDetector(
-          onTap: () => setState(() => selectedPackage = package),
+          onTap: isDisabled ? null : () => setState(() => selectedPackage = package),
           child: Badge(
               label: savePercentage != null ? Text(uiConfig.editingSavePercentageText(savePercentage)) : null,
               backgroundColor: savePercentage != null ? customTheme.popularBadgeBg : null,
@@ -239,6 +251,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   }
 
   Widget _buildFeaturesList() {
+    if (uiConfig.features.isEmpty) return const SizedBox();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

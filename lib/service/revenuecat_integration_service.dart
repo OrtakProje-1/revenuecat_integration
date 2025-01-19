@@ -12,6 +12,7 @@ import 'package:revenuecat_integration/pages/subscription_screen.dart';
 
 class RevenuecatIntegrationService {
   String entitlement = "";
+  String? activePackageIdentifier;
 
   RevenuecatIntegrationService._();
   static RevenuecatIntegrationService? _instance;
@@ -56,9 +57,11 @@ class RevenuecatIntegrationService {
     isPremium.value = customerInfo.entitlements.all[entitlement]?.isActive ?? false;
   }
 
-  Future<bool> purchase(Package package, {String? entitlementKey = "premium"}) async {
+  Future<bool> purchase(Package package, {String entitlementKey = "premium"}) async {
     final purchaserInfo = await Purchases.purchasePackage(package);
-    isPremium.value = purchaserInfo.entitlements.all[entitlementKey]?.isActive ?? false;
+    var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
+    activePackageIdentifier = entitlementInfo?.identifier;
+    isPremium.value = entitlementInfo?.isActive ?? false;
     return isPremium.value;
   }
 
