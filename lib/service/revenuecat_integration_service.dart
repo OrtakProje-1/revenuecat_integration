@@ -8,7 +8,7 @@ import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart
 import 'package:revenuecat_integration/models/store_config.dart';
 import 'package:revenuecat_integration/util/defines.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
-import 'package:revenuecat_integration/widgets/subscription_screen.dart';
+import 'package:revenuecat_integration/pages/subscription_screen.dart';
 
 class RevenuecatIntegrationService {
   String entitlement = "";

@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:revenuecat_integration/models/lottie_widget_config.dart';
 
 class LottieWidget extends StatefulWidget {
-  final String asset;
-  final Size size;
-  final bool repeat;
-  final int delayMs;
-  final bool reverse;
+  final LottieWidgetConfig config;
   const LottieWidget({
     super.key,
-    required this.asset,
-    this.delayMs = 0,
-    this.reverse = false,
-    this.size = const Size(40, 40),
-    this.repeat = false,
+    required this.config,
   });
 
   @override
@@ -28,6 +21,7 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
     animationController = AnimationController(vsync: this);
     super.initState();
   }
+
   @override
   void dispose() {
     animationController.dispose();
@@ -36,21 +30,20 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    
     return Lottie.asset(
-      "packages/revenuecat_integration/assets/animations/${widget.asset}.json",
+      (widget.config.package ?? "").isNotEmpty ? "packages/${widget.config.package}/${widget.config.asset}" : widget.config.asset,
       fit: BoxFit.cover,
-      width: widget.size.width,
-      height: widget.size.height,
-      repeat: widget.repeat,
-      reverse: widget.repeat,
+      width: widget.config.size.width,
+      height: widget.config.size.height,
+      repeat: widget.config.repeat,
+      reverse: widget.config.repeat,
       controller: animationController,
       alignment: Alignment.bottomCenter,
       onLoaded: (s) {
         animationController = animationController..duration = s.duration;
-        Future.delayed(Duration(milliseconds: widget.delayMs), () {
-          if (widget.repeat) {
-            animationController.repeat(reverse: widget.reverse);
+        Future.delayed(Duration(milliseconds: widget.config.delayMs), () {
+          if (widget.config.repeat) {
+            animationController.repeat(reverse: widget.config.reverse);
           } else {
             animationController.forward();
           }

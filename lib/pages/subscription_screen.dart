@@ -3,10 +3,11 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
 import 'package:revenuecat_integration/extensions/revenuecat_theme_extension.dart';
+import 'package:revenuecat_integration/models/lottie_widget_config.dart';
 import 'package:revenuecat_integration/util/extensions.dart';
 import 'package:revenuecat_integration/widgets/feature_item.dart';
 import '../service/revenuecat_integration_service.dart';
-import 'lottie_widget.dart';
+import '../widgets/lottie_widget.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key, this.uiConfig});
@@ -64,6 +65,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Widget build(BuildContext context) {
     var size = MediaQuery.sizeOf(context);
     RevenuecatThemeExtension customTheme = context.revenuecatThemeExtension;
+    var lottieAsset = context.isDarkTheme ? "subscription_bg_dark_animation.json" : "subscription_bg_light_animation.json";
 
     return Scaffold(
       backgroundColor: uiConfig.backgroundBuilder == null ? null : Colors.transparent,
@@ -78,9 +80,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               child: Opacity(
                 opacity: 0.3,
                 child: LottieWidget(
-                  asset: context.isDarkTheme ? "subscription_bg_dark_animation" : "subscription_bg_light_animation",
-                  repeat: true,
-                  size: const Size(300, 300),
+                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', repeat: true, size: const Size(300, 300)),
                 ),
               ),
             ),
@@ -92,9 +92,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 child: Opacity(
                   opacity: 0.3,
                   child: LottieWidget(
-                    asset: context.isDarkTheme ? "subscription_bg_dark_animation" : "subscription_bg_light_animation",
-                    repeat: true,
-                    size: const Size(300, 300),
+                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', repeat: true, size: const Size(300, 300)),
                   ),
                 ),
               ),
@@ -110,11 +108,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Center(
+                  Center(
                     child: LottieWidget(
-                      asset: 'premium',
-                      size: Size(250, 250),
-                      repeat: true,
+                      config: LottieWidgetConfig(asset: 'assets/animations/premium.json', repeat: true, size: const Size(250, 250)),
                     ),
                   ),
                   const SizedBox(height: 24),
