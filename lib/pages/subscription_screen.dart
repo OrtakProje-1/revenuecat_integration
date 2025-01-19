@@ -240,11 +240,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               backgroundColor: savePercentage != null ? customTheme.popularBadgeBg : null,
               textColor: customTheme.popularBadgeText,
               isLabelVisible: savePercentage != null,
-              offset: const Offset(-75, -6),
-              child: ClipRRect(
-                clipBehavior: Clip.hardEdge,
-                child: child,
-              )),
+              alignment: Alignment.topLeft,
+              offset: const Offset(18, -8),
+              child: ClipRRect(clipBehavior: Clip.hardEdge, child: child)),
         );
       }).toList(),
     );
