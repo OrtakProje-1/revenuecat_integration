@@ -80,7 +80,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               child: Opacity(
                 opacity: 0.3,
                 child: LottieWidget(
-                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', repeat: true, size: const Size(300, 300)),
+                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenuecat_integration", repeat: true, size: const Size(300, 300)),
                 ),
               ),
             ),
@@ -92,7 +92,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 child: Opacity(
                   opacity: 0.3,
                   child: LottieWidget(
-                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', repeat: true, size: const Size(300, 300)),
+                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenuecat_integration", repeat: true, size: const Size(300, 300)),
                   ),
                 ),
               ),
@@ -110,7 +110,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 children: [
                   Center(
                     child: LottieWidget(
-                      config: LottieWidgetConfig(asset: 'assets/animations/premium.json', repeat: true, size: const Size(250, 250)),
+                      config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenuecat_integration", repeat: true, size: const Size(250, 250)),
                     ),
                   ),
                   const SizedBox(height: 24),
