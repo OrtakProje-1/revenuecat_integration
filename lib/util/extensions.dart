@@ -9,6 +9,10 @@ extension BuildContextExt on BuildContext {
     return Navigator.pushAndRemoveUntil<T>(this, MaterialPageRoute(builder: (_) => page), (route) => false);
   }
 
+  void pop<T>(T? data) {
+    Navigator.pop<T>(this, data);
+  }
+
   bool get isDarkTheme => Theme.of(this).brightness == Brightness.dark;
   TextTheme get textTheme => Theme.of(this).textTheme;
 }

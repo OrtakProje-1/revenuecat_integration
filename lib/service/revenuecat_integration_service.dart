@@ -66,8 +66,11 @@ class RevenuecatIntegrationService {
     return isPremium.value;
   }
 
-  Future<void> restore() async {
-    // Restore the purchases
+  Future<bool> restore() async {
+    var info = await Purchases.restorePurchases();
+    var isActive = info.entitlements.all[entitlement]?.isActive ?? false;
+    isPremium.value = isActive;
+    return isActive;
   }
 
   Future<void> purchaseRestored() async {

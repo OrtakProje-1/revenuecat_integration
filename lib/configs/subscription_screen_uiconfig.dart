@@ -9,6 +9,7 @@ class SubscriptionScreenUiConfig {
   String popularBadgeText;
   String includesTitle;
   String activePackageText;
+  String restorePurchases;
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
@@ -21,6 +22,7 @@ class SubscriptionScreenUiConfig {
     this.popularBadgeText = 'Popular',
     this.includesTitle = 'Includes',
     this.activePackageText = 'Active package',
+    this.restorePurchases = 'Restore purchases',
     this.backgroundBuilder,
     this.editingSavePercentageText = defaultEditingSavePercentageText,
     this.editingTrialDaysText = defaultTrialDaysText,

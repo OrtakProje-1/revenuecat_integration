@@ -1,3 +1,4 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
@@ -23,6 +24,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Package? selectedPackage;
   List<Package> packages = [];
   bool isLoading = true;
+  ValueNotifier<bool> restoringPurchases = ValueNotifier(false);
 
   RevenuecatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenuecatIntegrationTheme.dark : RevenuecatIntegrationTheme.light);
   RevenuecatIntegrationService get service => RevenuecatIntegrationService.instance;
@@ -147,7 +149,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             left: 16,
             child: IconButton(
               icon: Icon(Icons.close, color: theme.trialText),
-              onPressed: () => Navigator.pop(context, PaywallResult.cancelled),
+              onPressed: () => context.pop(PaywallResult.cancelled),
             ),
           ),
         ],
@@ -271,36 +273,50 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: ElevatedButton(
-        onPressed: selectedPackage == null
-            ? null
-            : () async {
-                try {
-                  var result = await service.purchase(selectedPackage!);
-                  if (!context.mounted) return;
-                  Navigator.pop(context, result ? PaywallResult.purchased : PaywallResult.cancelled);
-                } catch (e) {
-                  Navigator.pop(context, PaywallResult.error);
-                }
-              },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.trialText,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: Text(
-          uiConfig.purchaseButtonTitle,
-          style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
-        ),
-      ),
+      child: ValueListenableBuilder(
+          valueListenable: restoringPurchases,
+          builder: (context, value, _) {
+            return AnimatedOpacity(
+              duration: const Duration(seconds: 2),
+              opacity: value ? .4 : 1,
+              child: ElevatedButton(
+                onPressed: selectedPackage == null
+                    ? null
+                    : () async {
+                        if (value) return;
+                        try {
+                          var result = await service.purchase(selectedPackage!);
+                          if (!context.mounted) return;
+                          context.pop(result ? PaywallResult.purchased : PaywallResult.cancelled);
+                        } catch (e) {
+                          context.pop(PaywallResult.error);
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.trialText,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  uiConfig.purchaseButtonTitle,
+                  style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
+                ),
+              ),
+            );
+          }),
     );
   }
 
   Widget buildFooter() {
     return TextButton(
-      onPressed: () => Purchases.restorePurchases(),
-      child: const Text("Satın Almaları Geri Yükle"),
+      onPressed: () async {
+        var result = await service.restore();
+        if (result) {
+          context.pop(PaywallResult.restored);
+        }
+      },
+      child: Text(uiConfig.restorePurchases),
     );
   }
 
