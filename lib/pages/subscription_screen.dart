@@ -137,8 +137,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   const SizedBox(height: 32),
                   _buildFeaturesList(),
                   const SizedBox(height: 24),
-                  _buildSubscribeButton(context)
-                  // _buildFooter(),
+                  _buildSubscribeButton(context),
+                  const SizedBox(height: 16),
+                  _buildFooter(),
                 ],
               ),
             ),
@@ -308,7 +309,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     );
   }
 
-  Widget buildFooter() {
+  Widget _buildFooter() {
     return TextButton(
       onPressed: () async {
         var result = await service.restore();
