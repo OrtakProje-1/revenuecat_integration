@@ -312,7 +312,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Widget _buildFooter() {
     return TextButton(
       onPressed: () async {
+        restoringPurchases.value = true;
         var result = await service.restore();
+        restoringPurchases.value = false;
         if (result) {
           context.pop(PaywallResult.restored);
         }
