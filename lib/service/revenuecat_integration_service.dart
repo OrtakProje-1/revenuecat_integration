@@ -156,31 +156,14 @@ class RevenuecatIntegrationService {
 
   /// Returns the number of days in the trial period of the given [Package] or null if
   /// there is no trial period.
-  (int?, PeriodUnit)? getTrialDays(Package package) {
+  (int, PeriodUnit)? getTrialDays(Package package) {
     IntroductoryPrice? introPrice = package.storeProduct.introductoryPrice;
 
     if (introPrice == null) {
       return null;
     }
-    int trialDay = 0;
-    switch (introPrice.periodUnit) {
-      case PeriodUnit.day:
-        trialDay = introPrice.periodNumberOfUnits;
-        break;
-      case PeriodUnit.month:
-        trialDay = introPrice.periodNumberOfUnits * 30;
-        break;
-      case PeriodUnit.week:
-        trialDay = introPrice.periodNumberOfUnits * 7;
-        break;
-      case PeriodUnit.year:
-        trialDay = introPrice.periodNumberOfUnits * 365;
-        break;
-      case PeriodUnit.unknown:
-        return null;
-    }
 
-    return (trialDay == 0 ? null : trialDay, introPrice.periodUnit);
+    return (introPrice.periodNumberOfUnits, introPrice.periodUnit);
   }
 
   /// Fetches the available packages for the user and returns them in a list, or
