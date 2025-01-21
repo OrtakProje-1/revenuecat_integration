@@ -32,3 +32,12 @@ extension ObjectExt on Object? {
   bool get isNull => this == null;
   bool get isNotNull => this != null;
 }
+
+extension ListExt<T> on List<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (final element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
+}

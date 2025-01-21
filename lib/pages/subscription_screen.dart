@@ -72,7 +72,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     var lottieAsset = context.isDarkTheme ? "subscription_bg_dark_animation.json" : "subscription_bg_light_animation.json";
 
     return Scaffold(
-      backgroundColor: uiConfig.backgroundBuilder == null ? null : Colors.transparent,
+      backgroundColor: theme.backgroundColor,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -164,7 +164,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         var isDisabled = package.identifier == service.activePackageIdentifier;
         final isSelected = selectedPackage == package;
         final bool isPopular = service.isPopular(package);
-        final int? trialDays = service.getTrialDays(package);
+        final (int?,PeriodUnit)?  trialDays = service.getTrialDays(package);
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
           color: isPopular ? theme.popularBadgeBg : Colors.transparent,
@@ -207,9 +207,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (trialDays != null)
+                      if (trialDays?.$1 != null)
                         Text(
-                          uiConfig.editingTrialDaysText(trialDays),
+                          uiConfig.editingTrialDaysText(trialDays!.$1!,trialDays.$2),
                           style: TextStyle(
                             color: theme.trialText,
                             fontWeight: FontWeight.w500,

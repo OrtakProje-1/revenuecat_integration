@@ -8,6 +8,7 @@ class RevenuecatIntegrationTheme {
   final Color popularBadgeText;
   final Color trialText;
   final Color saveText;
+  final Color? backgroundColor;
 
   RevenuecatIntegrationTheme({
     required this.packageSelectedBg,
@@ -17,6 +18,7 @@ class RevenuecatIntegrationTheme {
     required this.popularBadgeText,
     required this.trialText,
     required this.saveText,
+    this.backgroundColor,
   });
 
   static final light = RevenuecatIntegrationTheme(
@@ -47,6 +49,7 @@ class RevenuecatIntegrationTheme {
     Color? popularBadgeText,
     Color? trialText,
     Color? saveText,
+    Color? backgroundColor,
   }) {
     return RevenuecatIntegrationTheme(
       packageSelectedBg: packageSelectedBg ?? this.packageSelectedBg,
@@ -56,6 +59,7 @@ class RevenuecatIntegrationTheme {
       popularBadgeText: popularBadgeText ?? this.popularBadgeText,
       trialText: trialText ?? this.trialText,
       saveText: saveText ?? this.saveText,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
 
@@ -72,6 +76,7 @@ class RevenuecatIntegrationTheme {
       popularBadgeText: Color.lerp(popularBadgeText, other.popularBadgeText, t)!,
       trialText: Color.lerp(trialText, other.trialText, t)!,
       saveText: Color.lerp(saveText, other.saveText, t)!,
+      backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t),
     );
   }
 }

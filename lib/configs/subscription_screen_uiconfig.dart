@@ -1,3 +1,4 @@
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:revenuecat_integration/configs/packages_text_config.dart';
 import 'package:revenuecat_integration/util/defines.dart';
 import 'package:revenuecat_integration/widgets/feature_item.dart';
@@ -14,7 +15,7 @@ class SubscriptionScreenUiConfig {
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
   EditableText editingSavePercentageText;
-  EditableText editingTrialDaysText;
+  TrialDaysEditableText editingTrialDaysText;
   SubscriptionScreenUiConfig({
     this.title = 'Choose a plan',
     this.description = 'Unlock all the features by subscribing to our service',
@@ -35,6 +36,27 @@ class SubscriptionScreenUiConfig {
 String defaultEditingSavePercentageText(int percentage) {
   return 'Save $percentage%';
 }
-String defaultTrialDaysText(int trialDays) {
-  return 'Free $trialDays days trial';
+String defaultTrialDaysText(int trialDays,PeriodUnit periodUnit ) {
+  
+
+String type = "day";
+
+switch (periodUnit) {
+  case PeriodUnit.day:
+    type = PeriodUnit.day.name;
+    break;
+  case PeriodUnit.week:
+    type = PeriodUnit.week.name;
+    break;
+  case PeriodUnit.month:
+    type = PeriodUnit.month.name;
+    break;
+  case PeriodUnit.year:
+    type = PeriodUnit.year.name;
+    break;
+  
+  default:
+  type = "day";
+}
+  return 'Free $trialDays $type trial';
 }
