@@ -136,20 +136,18 @@ class RevenuecatIntegrationService {
         return null;
     }
 
-    if (package.packageType == PackageType.annual) {
-      final monthlyPackage = packages.firstWhereOrNull((p) => p.packageType == PackageType.monthly);
+    final monthlyPackage = packages.firstWhereOrNull((p) => p.packageType == PackageType.monthly);
 
-      if (monthlyPackage == null) return null;
+    if (monthlyPackage == null) return null;
 
-      final packagePrice = package.storeProduct.price;
-      final monthlyPrice = monthlyPackage.storeProduct.price;
+    final packagePrice = package.storeProduct.price;
+    final monthlyPrice = monthlyPackage.storeProduct.price;
 
-      if (monthlyPrice > 0) {
-        final totalMonthlyCost = monthlyPrice * months;
-        final discountPercentage = ((totalMonthlyCost - packagePrice) / totalMonthlyCost * 100).round();
+    if (monthlyPrice > 0) {
+      final totalMonthlyCost = monthlyPrice * months;
+      final discountPercentage = ((totalMonthlyCost - packagePrice) / totalMonthlyCost * 100).round();
 
-        return discountPercentage;
-      }
+      return discountPercentage;
     }
     return null;
   }

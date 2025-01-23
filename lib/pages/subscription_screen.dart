@@ -56,7 +56,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       final List<Package>? packages = await service.getPackages();
       if (packages != null) {
         setState(() {
-          this.packages = packages;
+          this.packages = [...packages]..sort((a, b) => b.packageType.index.compareTo(a.packageType.index));
           selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual);
           isLoading = false;
         });
@@ -287,8 +287,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         if (value) return;
                         try {
                           var result = await service.purchase(selectedPackage!);
-                          if (!context.mounted) return;
-                          context.pop(result ? PaywallResult.purchased : PaywallResult.cancelled);
+                          if (!context.mounted || !result) return;
+                          context.pop(PaywallResult.purchased);
                         } catch (e) {
                           context.pop(PaywallResult.error);
                         }
