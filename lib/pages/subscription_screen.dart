@@ -164,7 +164,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         var isDisabled = package.identifier == service.activePackageIdentifier;
         final isSelected = selectedPackage == package;
         final bool isPopular = service.isPopular(package);
-        final (int?,PeriodUnit)?  trialDays = service.getTrialDays(package);
+        final (int?, PeriodUnit)? trialDays = service.getTrialDays(package);
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
           color: isPopular ? theme.popularBadgeBg : Colors.transparent,
@@ -209,7 +209,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                       ),
                       if (trialDays?.$1 != null)
                         Text(
-                          uiConfig.editingTrialDaysText(trialDays!.$1!,trialDays.$2),
+                          uiConfig.editingTrialDaysText(trialDays!.$1!, trialDays.$2),
                           style: TextStyle(
                             color: theme.trialText,
                             fontWeight: FontWeight.w500,
@@ -300,13 +300,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   ),
                 ),
                 child: Text(
-                  uiConfig.purchaseButtonTitle,
+                  packageHasOffer(selectedPackage) ? uiConfig.specialOfferTitle : uiConfig.purchaseButtonTitle,
                   style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
                 ),
               ),
             );
           }),
     );
+  }
+
+  bool packageHasOffer(Package? package) {
+    if (package.isNull) return false;
+    int offeringCount = package!.storeProduct.subscriptionOptions?.where((e) => e.freePhase == null).length ?? 0;
+    return offeringCount > 1;
   }
 
   Widget _buildFooter() {

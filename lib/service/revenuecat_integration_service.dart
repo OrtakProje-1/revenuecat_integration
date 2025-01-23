@@ -157,13 +157,12 @@ class RevenuecatIntegrationService {
   /// Returns the number of days in the trial period of the given [Package] or null if
   /// there is no trial period.
   (int, PeriodUnit)? getTrialDays(Package package) {
-    IntroductoryPrice? introPrice = package.storeProduct.introductoryPrice;
-
-    if (introPrice == null) {
+    SubscriptionOption? subscriptionOption = package.storeProduct.subscriptionOptions?.firstWhereOrNull((e) => e.freePhase.isNotNull);
+    if (subscriptionOption == null) {
       return null;
     }
 
-    return (introPrice.periodNumberOfUnits, introPrice.periodUnit);
+    return (subscriptionOption.freePhase!.billingPeriod!.value, subscriptionOption.freePhase!.billingPeriod!.unit);
   }
 
   /// Fetches the available packages for the user and returns them in a list, or
@@ -210,7 +209,11 @@ class RevenuecatIntegrationService {
       {SubscriptionScreenUiConfig? uiConfig, RevenuecatIntegrationTheme? theme, DesignTemplateType templateType = DesignTemplateType.custom}) async {
     if (templateType == DesignTemplateType.defaultUI) {
       try {
-        return await RevenueCatUI.presentPaywallIfNeeded(entitlement);
+        var paywallResult = await RevenueCatUI.presentPaywallIfNeeded(entitlement);
+        if (paywallResult == PaywallResult.purchased) {
+          await checkPremium();
+        }
+        return paywallResult;
       } catch (_) {}
     }
     return await context.push<PaywallResult>(SubscriptionScreen(

@@ -11,6 +11,7 @@ class SubscriptionScreenUiConfig {
   String includesTitle;
   String activePackageText;
   String restorePurchases;
+  String specialOfferTitle;
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
@@ -24,6 +25,7 @@ class SubscriptionScreenUiConfig {
     this.includesTitle = 'Includes',
     this.activePackageText = 'Active package',
     this.restorePurchases = 'Restore purchases',
+    this.specialOfferTitle = 'View special offer',
     this.backgroundBuilder,
     this.editingSavePercentageText = defaultEditingSavePercentageText,
     this.editingTrialDaysText = defaultTrialDaysText,
