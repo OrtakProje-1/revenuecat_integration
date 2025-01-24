@@ -57,7 +57,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       if (packages != null) {
         setState(() {
           this.packages = [...packages]..sort((a, b) => b.packageType.index.compareTo(a.packageType.index));
-          selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual);
+          selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual && package.identifier != service.activePackageIdentifier) ?? packages.firstOrNull;
           isLoading = false;
         });
       }

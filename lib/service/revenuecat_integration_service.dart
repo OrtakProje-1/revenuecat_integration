@@ -21,7 +21,7 @@ class RevenuecatIntegrationService {
   RevenuecatIntegrationService._();
   static RevenuecatIntegrationService? _instance;
 
-  static RevenuecatIntegrationService get instance => _instance ?? RevenuecatIntegrationService._();
+  static RevenuecatIntegrationService get instance => _instance ??= RevenuecatIntegrationService._();
 
   final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
 
@@ -59,7 +59,8 @@ class RevenuecatIntegrationService {
   void listenCustomerInfo() {
     Purchases.addCustomerInfoUpdateListener((info) {
       customerInfo = info;
-      debugPrint("--- Customer ingo updated! ${info.toString()}");
+      activePackageIdentifier = info.entitlements.all[entitlement]?.productIdentifier;
+      debugPrint("--- Customer info updated! ${info.toString()}");
     });
   }
 
