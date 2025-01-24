@@ -16,7 +16,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 class RevenuecatIntegrationService {
   String entitlement = "";
   CustomerInfo? customerInfo;
-  String? activePackageIdentifier;
+  List<String> activeSubscriptions = [];
 
   RevenuecatIntegrationService._();
   static RevenuecatIntegrationService? _instance;
@@ -59,7 +59,8 @@ class RevenuecatIntegrationService {
   void listenCustomerInfo() {
     Purchases.addCustomerInfoUpdateListener((info) {
       customerInfo = info;
-      activePackageIdentifier = info.entitlements.all[entitlement]?.productIdentifier;
+      isPremium.value = info.entitlements.all[entitlement]?.isActive ?? false;
+      activeSubscriptions = info.activeSubscriptions;
       debugPrint("--- Customer info updated! ${info.toString()}");
     });
   }
@@ -78,7 +79,7 @@ class RevenuecatIntegrationService {
 
   /// Purchase a [Package].
   ///
-  /// Purchases the provided [Package] and sets [activePackageIdentifier] to the
+  /// Purchases the provided [Package] and sets [activeSubscriptions] to the
   /// identifier of the package if the purchase is successful.
   ///
   /// Sets [isPremium] to true if the customer is entitled to the provided
@@ -91,7 +92,7 @@ class RevenuecatIntegrationService {
     try {
       final purchaserInfo = await Purchases.purchasePackage(package);
       var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
-      activePackageIdentifier = entitlementInfo?.identifier;
+      activeSubscriptions = purchaserInfo.activeSubscriptions;
       isPremium.value = entitlementInfo?.isActive ?? false;
       return isPremium.value;
     } on PlatformException catch (_) {

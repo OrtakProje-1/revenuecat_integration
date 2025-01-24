@@ -57,7 +57,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       if (packages != null) {
         setState(() {
           this.packages = [...packages]..sort((a, b) => b.packageType.index.compareTo(a.packageType.index));
-          selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual && package.identifier != service.activePackageIdentifier) ?? packages.firstOrNull;
+          selectedPackage = packages.firstWhereOrNull((package) => package.packageType == PackageType.annual && package.identifier != service.activeSubscriptions) ?? packages.firstOrNull;
           isLoading = false;
         });
       }
@@ -161,7 +161,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Widget _buildPackageCards() {
     return Column(
       children: packages.map((package) {
-        var isDisabled = package.identifier == service.activePackageIdentifier;
+        var isDisabled = service.activeSubscriptions.contains(package.storeProduct.identifier);
         final isSelected = selectedPackage == package;
         final bool isPopular = service.isPopular(package);
         final (int?, PeriodUnit)? trialDays = service.getTrialDays(package);
@@ -309,12 +309,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             );
           }),
     );
-  }
-
-  bool packageHasOffer(Package? package) {
-    if (package.isNull) return false;
-    int offeringCount = package!.storeProduct.subscriptionOptions?.where((e) => e.freePhase == null).length ?? 0;
-    return offeringCount > 1;
   }
 
   Widget _buildFooter() {
