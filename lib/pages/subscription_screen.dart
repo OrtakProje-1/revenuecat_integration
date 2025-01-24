@@ -300,7 +300,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   ),
                 ),
                 child: Text(
-                  (selectedPackage != null && selectedPackage!.storeProduct.defaultOption.isNotNull) ? uiConfig.specialOfferTitle : uiConfig.purchaseButtonTitle,
+                  (selectedPackage != null && selectedPackage!.storeProduct.defaultOption.isNotNull && !selectedPackage!.storeProduct.defaultOption!.isBasePlan)
+                      ? uiConfig.specialOfferTitle
+                      : uiConfig.purchaseButtonTitle,
                   style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
                 ),
               ),
