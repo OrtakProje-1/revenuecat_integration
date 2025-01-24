@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
@@ -86,12 +87,29 @@ class RevenuecatIntegrationService {
   /// entitlement, false otherwise).
   ///
   Future<bool> purchase(Package package, {String entitlementKey = "premium"}) async {
-    final purchaserInfo = await Purchases.purchasePackage(package);
-    var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
-    activePackageIdentifier = entitlementInfo?.identifier;
-    isPremium.value = entitlementInfo?.isActive ?? false;
-    return isPremium.value;
+    try {
+      final purchaserInfo = await Purchases.purchasePackage(package);
+      var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
+      activePackageIdentifier = entitlementInfo?.identifier;
+      isPremium.value = entitlementInfo?.isActive ?? false;
+      return isPremium.value;
+    } on PlatformException catch (_) {
+      return false;
+    }
   }
+
+  // Future<bool> purchaseSubscriptionOption(SubscriptionOption option) async {
+  //   try {
+  //     final CustomerInfo info = await Purchases.purchaseSubscriptionOption(option);
+  //     isPremium.value = info.entitlements.active[entitlement]?.isActive ?? false;
+  //     return isPremium.value;
+  //   } on PlatformException catch (error) {
+  //     PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
+  //     log("---PurchaseError ${error.message}", error: error);
+  //     debugPrint(code == PurchasesErrorCode.purchaseCancelledError ? "Satın alma iptal edildi" : "Satın alımda bir hata oluştu. Hata kodu: $code, hata: ${error.message}");
+  //     return false;
+  //   }
+  // }
 
   /// Restore purchases and set [isPremium] to true if the customer is entitled to [entitlement].
   ///
@@ -155,12 +173,12 @@ class RevenuecatIntegrationService {
   /// Returns the number of days in the trial period of the given [Package] or null if
   /// there is no trial period.
   (int, PeriodUnit)? getTrialDays(Package package) {
-    SubscriptionOption? subscriptionOption = package.storeProduct.subscriptionOptions?.firstWhereOrNull((e) => e.freePhase.isNotNull);
-    if (subscriptionOption == null) {
+    SubscriptionOption? subscriptionOption = package.storeProduct.defaultOption;
+    if (subscriptionOption?.freePhase?.billingPeriod == null) {
       return null;
     }
 
-    return (subscriptionOption.freePhase!.billingPeriod!.value, subscriptionOption.freePhase!.billingPeriod!.unit);
+    return (subscriptionOption!.freePhase!.billingPeriod!.value, subscriptionOption.freePhase!.billingPeriod!.unit);
   }
 
   /// Fetches the available packages for the user and returns them in a list, or
