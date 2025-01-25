@@ -9,3 +9,4 @@ export 'package:revenuecat_integration/widgets/subscription_button.dart';
 export 'package:revenuecat_integration/pages/subscription_screen.dart';
 export 'package:revenuecat_integration/widgets/feature_item.dart';
 export 'package:purchases_flutter/purchases_flutter.dart';
+export 'package:purchases_ui_flutter/paywall_result.dart';
