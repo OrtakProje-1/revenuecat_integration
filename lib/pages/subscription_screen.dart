@@ -135,6 +135,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                       style: context.textTheme.bodyLarge?.copyWith(
                         color: Colors.grey,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
                     _buildFeaturesList(),
@@ -236,10 +237,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 if (isDisabled)
                   Card(
                     elevation: 0,
-                    color: theme.packageBorderColor,
+                    color: theme.popularBadgeBg,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: Text(uiConfig.activePackageText),
+                      child: Text(
+                        uiConfig.activePackageText,
+                        style: TextStyle(color: theme.popularBadgeText),
+                      ),
                     ),
                   )
                 else
@@ -301,8 +305,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     : () async {
                         if (value) return;
                         try {
-                          PaywallResult  result = await service.purchase(selectedPackage!);
-                          if (!context.mounted || result == PaywallResult .purchased) return;
+                          PaywallResult result = await service.purchase(selectedPackage!);
+                          if (!context.mounted || result == PaywallResult.purchased) return;
                           context.pop(PaywallResult.purchased);
                         } catch (e) {
                           context.pop(PaywallResult.error);
