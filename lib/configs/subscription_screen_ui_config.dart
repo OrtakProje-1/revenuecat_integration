@@ -1,7 +1,7 @@
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:revenuecat_integration/configs/packages_text_config.dart';
-import 'package:revenuecat_integration/util/defines.dart';
-import 'package:revenuecat_integration/widgets/feature_item.dart';
+import 'package:revenue_cat_integration/configs/packages_text_config.dart';
+import 'package:revenue_cat_integration/util/defines.dart';
+import 'package:revenue_cat_integration/widgets/feature_item.dart';
 
 class SubscriptionScreenUiConfig {
   String title;
@@ -15,6 +15,7 @@ class SubscriptionScreenUiConfig {
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
+  SubscriptionScreenForegroundBuilder? foregroundBuilder;
   EditableText editingSavePercentageText;
   TrialDaysEditableText editingTrialDaysText;
   SubscriptionScreenUiConfig({
@@ -27,38 +28,37 @@ class SubscriptionScreenUiConfig {
     this.restorePurchases = 'Restore purchases',
     this.specialOfferTitle = 'View special offer',
     this.backgroundBuilder,
+    this.foregroundBuilder,
     this.editingSavePercentageText = defaultEditingSavePercentageText,
     this.editingTrialDaysText = defaultTrialDaysText,
-    this.features = const[],
+    this.features = const [],
     PackagesTextConfig? packagesTextConfig,
   }) : packagesTextConfig = packagesTextConfig ?? PackagesTextConfig.defaultConfig();
-  
 }
 
 String defaultEditingSavePercentageText(int percentage) {
   return 'Save $percentage%';
 }
-String defaultTrialDaysText(int trialDays,PeriodUnit periodUnit ) {
-  
 
-String type = "day";
+String defaultTrialDaysText(int trialDays, PeriodUnit periodUnit) {
+  String type = "day";
 
-switch (periodUnit) {
-  case PeriodUnit.day:
-    type = PeriodUnit.day.name;
-    break;
-  case PeriodUnit.week:
-    type = PeriodUnit.week.name;
-    break;
-  case PeriodUnit.month:
-    type = PeriodUnit.month.name;
-    break;
-  case PeriodUnit.year:
-    type = PeriodUnit.year.name;
-    break;
-  
-  default:
-  type = "day";
-}
+  switch (periodUnit) {
+    case PeriodUnit.day:
+      type = PeriodUnit.day.name;
+      break;
+    case PeriodUnit.week:
+      type = PeriodUnit.week.name;
+      break;
+    case PeriodUnit.month:
+      type = PeriodUnit.month.name;
+      break;
+    case PeriodUnit.year:
+      type = PeriodUnit.year.name;
+      break;
+
+    default:
+      type = "day";
+  }
   return 'Free $trialDays $type trial';
 }

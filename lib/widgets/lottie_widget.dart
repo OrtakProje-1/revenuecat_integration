@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:revenuecat_integration/models/lottie_widget_config.dart';
-import 'package:revenuecat_integration/util/extensions.dart';
+import 'package:revenue_cat_integration/models/lottie_widget_config.dart';
+import 'package:revenue_cat_integration/util/extensions.dart';
 
 class LottieWidget extends StatefulWidget {
   final LottieWidgetConfig config;
@@ -33,7 +33,7 @@ class _LottieWidgetState extends State<LottieWidget> with SingleTickerProviderSt
     if (widget.config.asset.isNotNull) {
       return (widget.config.package ?? "").isNotEmpty ? "packages/${widget.config.package}/${widget.config.asset}" : widget.config.asset!;
     } else {
-      return "packages/revenuecat_integration/assets/animations/premium.json";
+      return "packages/revenue_cat_integration/assets/animations/premium.json";
     }
   }
 

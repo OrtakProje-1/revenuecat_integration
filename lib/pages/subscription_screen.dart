@@ -2,17 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
-import 'package:revenuecat_integration/models/lottie_widget_config.dart';
-import 'package:revenuecat_integration/models/revenuecat_integration_theme.dart';
-import 'package:revenuecat_integration/util/extensions.dart';
-import 'package:revenuecat_integration/widgets/feature_item.dart';
-import '../service/revenuecat_integration_service.dart';
+import 'package:revenue_cat_integration/configs/subscription_screen_ui_config.dart';
+import 'package:revenue_cat_integration/models/lottie_widget_config.dart';
+import 'package:revenue_cat_integration/models/revenue_cat_integration_theme.dart';
+import 'package:revenue_cat_integration/util/extensions.dart';
+import 'package:revenue_cat_integration/widgets/feature_item.dart';
+import '../service/revenue_cat_integration_service.dart';
 import '../widgets/lottie_widget.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   final SubscriptionScreenUiConfig? uiConfig;
-  final RevenuecatIntegrationTheme? theme;
+  final RevenueCatIntegrationTheme? theme;
   const SubscriptionScreen({super.key, this.uiConfig, this.theme});
 
   @override
@@ -24,10 +24,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   Package? selectedPackage;
   List<Package> packages = [];
   bool isLoading = true;
+  bool isError = false;
   ValueNotifier<bool> restoringPurchases = ValueNotifier(false);
 
-  RevenuecatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenuecatIntegrationTheme.dark : RevenuecatIntegrationTheme.light);
-  RevenuecatIntegrationService get service => RevenuecatIntegrationService.instance;
+  RevenueCatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenueCatIntegrationTheme.dark : RevenueCatIntegrationTheme.light);
+  RevenueCatIntegrationService get service => RevenueCatIntegrationService.instance;
   SubscriptionScreenUiConfig get uiConfig =>
       widget.uiConfig ??
       SubscriptionScreenUiConfig(
@@ -55,15 +56,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     try {
       final List<Package>? packages = await service.getPackages();
       if (packages != null) {
-        setState(() {
-          this.packages = [...packages]..sort((a, b) => b.packageType.index.compareTo(a.packageType.index));
-          var unsubscribedPackages = this.packages.where((package) => !service.activeSubscriptions.contains(package.storeProduct.identifier)).toList();
-          selectedPackage = unsubscribedPackages.firstWhereOrNull((package) => package.packageType == PackageType.annual) ?? unsubscribedPackages.firstOrNull;
-          isLoading = false;
-        });
+        this.packages = [...packages]..sort((a, b) => b.packageType.index.compareTo(a.packageType.index));
+        var unsubscribedPackages = this.packages.where((package) => !service.activeSubscriptions.contains(package.storeProduct.identifier)).toList();
+        selectedPackage = unsubscribedPackages.firstWhereOrNull((package) => package.packageType == PackageType.annual) ?? unsubscribedPackages.firstOrNull;
       }
+      isError = packages.isNull || packages!.isEmpty;
     } catch (e) {
+      isError = true;
       debugPrint(e.toString());
+    } finally {
+      isLoading = false;
+      setState(() {});
     }
   }
 
@@ -85,7 +88,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               child: Opacity(
                 opacity: 0.3,
                 child: LottieWidget(
-                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenuecat_integration", repeat: true, size: const Size(300, 300)),
+                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
                 ),
               ),
             ),
@@ -97,69 +100,80 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 child: Opacity(
                   opacity: 0.3,
                   child: LottieWidget(
-                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenuecat_integration", repeat: true, size: const Size(300, 300)),
+                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
                   ),
                 ),
               ),
             ),
           ],
-
-          SingleChildScrollView(
-            clipBehavior: Clip.none,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: LottieWidget(
-                      config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenuecat_integration", repeat: true, size: const Size(250, 250)),
+          if (uiConfig.foregroundBuilder.isNull) ...[
+            SingleChildScrollView(
+              clipBehavior: Clip.none,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: LottieWidget(
+                        config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenue_cat_integration", repeat: true, size: const Size(250, 250)),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    uiConfig.title,
-                    style: context.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 24),
+                    Text(
+                      uiConfig.title,
+                      style: context.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    uiConfig.description,
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey,
+                    const SizedBox(height: 8),
+                    Text(
+                      uiConfig.description,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 32),
-                  _buildPackageCards(),
-                  const SizedBox(height: 32),
-                  _buildFeaturesList(),
-                  const SizedBox(height: 24),
-                  _buildSubscribeButton(context),
-                  const SizedBox(height: 16),
-                  _buildFooter(),
-                ],
+                    const SizedBox(height: 32),
+                    _buildFeaturesList(),
+                    const SizedBox(height: 32),
+                    _buildPackageCards(),
+                    const SizedBox(height: 24),
+                    _buildSubscribeButton(context),
+                    const SizedBox(height: 16),
+                    _buildFooter(),
+                  ],
+                ),
               ),
             ),
-          ),
-          // X butonu için Positioned widget
-          Positioned(
-            top: 48, // Safe area için üstten boşluk
-            left: 16,
-            child: IconButton(
-              icon: Icon(Icons.close, color: theme.trialText),
-              onPressed: () => context.pop(PaywallResult.cancelled),
+            Positioned(
+              top: 48,
+              left: 16,
+              child: IconButton(
+                icon: Icon(Icons.close, color: theme.trialText),
+                onPressed: () => context.pop(PaywallResult.cancelled),
+              ),
             ),
-          ),
+          ] else
+            uiConfig.foregroundBuilder!(context, packages, isError, isLoading)
         ],
       ),
     );
   }
 
   Widget _buildPackageCards() {
+    if (isError) {
+      return const Center(
+        child: Icon(Icons.bug_report_outlined),
+      );
+    }
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Column(
       children: packages.map((package) {
         var isDisabled = service.activeSubscriptions.contains(package.storeProduct.identifier);
@@ -287,8 +301,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     : () async {
                         if (value) return;
                         try {
-                          var result = await service.purchase(selectedPackage!);
-                          if (!context.mounted || !result) return;
+                          PaywallResult  result = await service.purchase(selectedPackage!);
+                          if (!context.mounted || result == PaywallResult .purchased) return;
                           context.pop(PaywallResult.purchased);
                         } catch (e) {
                           context.pop(PaywallResult.error);

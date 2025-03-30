@@ -3,7 +3,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('revenuecat_integration_service', () {
+  test('revenue_cat_integration_service', () {
     
   });
 }

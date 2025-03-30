@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RevenuecatIntegrationTheme {
+class RevenueCatIntegrationTheme {
   final Color packageSelectedBg;
   final Color packageUnselectedBg;
   final Color packageBorderColor;
@@ -10,7 +10,7 @@ class RevenuecatIntegrationTheme {
   final Color saveText;
   final Color? backgroundColor;
 
-  RevenuecatIntegrationTheme({
+  RevenueCatIntegrationTheme({
     required this.packageSelectedBg,
     required this.packageUnselectedBg,
     required this.packageBorderColor,
@@ -21,7 +21,7 @@ class RevenuecatIntegrationTheme {
     this.backgroundColor,
   });
 
-  static final light = RevenuecatIntegrationTheme(
+  static final light = RevenueCatIntegrationTheme(
     packageSelectedBg: const Color(0xffffea00).withAlpha(40),
     packageUnselectedBg: const Color(0xffffea00).withAlpha(20),
     packageBorderColor: const Color(0xffe68816),
@@ -31,7 +31,7 @@ class RevenuecatIntegrationTheme {
     saveText: const Color(0xffffea00),
   );
 
-  static final dark = RevenuecatIntegrationTheme(
+  static final dark = RevenueCatIntegrationTheme(
     packageSelectedBg: Colors.blue.shade900,
     packageUnselectedBg: Colors.grey.shade900,
     packageBorderColor: Colors.blue,
@@ -41,7 +41,7 @@ class RevenuecatIntegrationTheme {
     saveText: Colors.orange,
   );
 
-  RevenuecatIntegrationTheme copyWith({
+  RevenueCatIntegrationTheme copyWith({
     Color? packageSelectedBg,
     Color? packageUnselectedBg,
     Color? packageBorderColor,
@@ -51,7 +51,7 @@ class RevenuecatIntegrationTheme {
     Color? saveText,
     Color? backgroundColor,
   }) {
-    return RevenuecatIntegrationTheme(
+    return RevenueCatIntegrationTheme(
       packageSelectedBg: packageSelectedBg ?? this.packageSelectedBg,
       packageUnselectedBg: packageUnselectedBg ?? this.packageUnselectedBg,
       packageBorderColor: packageBorderColor ?? this.packageBorderColor,
@@ -63,12 +63,12 @@ class RevenuecatIntegrationTheme {
     );
   }
 
-  RevenuecatIntegrationTheme lerp(
-    RevenuecatIntegrationTheme? other,
+  RevenueCatIntegrationTheme lerp(
+    RevenueCatIntegrationTheme? other,
     double t,
   ) {
-    if (other is! RevenuecatIntegrationTheme) return this;
-    return RevenuecatIntegrationTheme(
+    if (other is! RevenueCatIntegrationTheme) return this;
+    return RevenueCatIntegrationTheme(
       packageSelectedBg: Color.lerp(packageSelectedBg, other.packageSelectedBg, t)!,
       packageUnselectedBg: Color.lerp(packageUnselectedBg, other.packageUnselectedBg, t)!,
       packageBorderColor: Color.lerp(packageBorderColor, other.packageBorderColor, t)!,

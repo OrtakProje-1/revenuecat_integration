@@ -4,24 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
-import 'package:revenuecat_integration/configs/subscription_screen_uiconfig.dart';
-import 'package:revenuecat_integration/models/revenuecat_integration_theme.dart';
-import 'package:revenuecat_integration/models/store_config.dart';
-import 'package:revenuecat_integration/util/defines.dart';
-import 'package:revenuecat_integration/util/extensions.dart';
-import 'package:revenuecat_integration/pages/subscription_screen.dart';
+import 'package:revenue_cat_integration/configs/subscription_screen_ui_config.dart';
+import 'package:revenue_cat_integration/models/revenue_cat_integration_theme.dart';
+import 'package:revenue_cat_integration/models/store_config.dart';
+import 'package:revenue_cat_integration/util/defines.dart';
+import 'package:revenue_cat_integration/util/extensions.dart';
+import 'package:revenue_cat_integration/pages/subscription_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class RevenuecatIntegrationService {
+class RevenueCatIntegrationService {
   String entitlement = "";
   CustomerInfo? customerInfo;
   List<String> activeSubscriptions = [];
 
-  RevenuecatIntegrationService._();
-  static RevenuecatIntegrationService? _instance;
+  RevenueCatIntegrationService._();
+  static RevenueCatIntegrationService? _instance;
 
-  static RevenuecatIntegrationService get instance => _instance ??= RevenuecatIntegrationService._();
+  static RevenueCatIntegrationService get instance => _instance ??= RevenueCatIntegrationService._();
 
   final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
 
@@ -88,15 +88,16 @@ class RevenuecatIntegrationService {
   /// Returns [isPremium] (true if the customer is entitled to the provided
   /// entitlement, false otherwise).
   ///
-  Future<bool> purchase(Package package, {String entitlementKey = "premium"}) async {
+  Future<PaywallResult> purchase(Package package, {String entitlementKey = "premium"}) async {
     try {
       final purchaserInfo = await Purchases.purchasePackage(package);
       var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
       activeSubscriptions = purchaserInfo.activeSubscriptions;
       isPremium.value = entitlementInfo?.isActive ?? false;
-      return isPremium.value;
-    } on PlatformException catch (_) {
-      return false;
+      return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
+    } on PlatformException catch (error) {
+      PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
+      return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
     }
   }
 
@@ -108,7 +109,7 @@ class RevenuecatIntegrationService {
   //   } on PlatformException catch (error) {
   //     PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
   //     log("---PurchaseError ${error.message}", error: error);
-  //     debugPrint(code == PurchasesErrorCode.purchaseCancelledError ? "Satın alma iptal edildi" : "Satın alımda bir hata oluştu. Hata kodu: $code, hata: ${error.message}");
+  //     debugPrint(code == PurchasesErrorCode.purchaseCancelledError ? "Purchase cancelled" : "There was an error with the purchase. Error code: $code, error: ${error.message}");
   //     return false;
   //   }
   // }
@@ -224,7 +225,7 @@ class RevenuecatIntegrationService {
   /// This function must be called from within a [Widget] subtree, as it
   /// uses [Navigator.push] to show the paywall.
   Future<PaywallResult?> goToSubscriptionPage(BuildContext context,
-      {SubscriptionScreenUiConfig? uiConfig, RevenuecatIntegrationTheme? theme, DesignTemplateType templateType = DesignTemplateType.custom}) async {
+      {SubscriptionScreenUiConfig? uiConfig, RevenueCatIntegrationTheme? theme, DesignTemplateType templateType = DesignTemplateType.custom}) async {
     if (templateType == DesignTemplateType.defaultUI) {
       try {
         var paywallResult = await RevenueCatUI.presentPaywallIfNeeded(entitlement);
@@ -234,6 +235,7 @@ class RevenuecatIntegrationService {
         return paywallResult;
       } catch (_) {}
     }
+    // ignore: use_build_context_synchronously
     return await context.push<PaywallResult>(SubscriptionScreen(
       theme: theme,
       uiConfig: uiConfig ?? SubscriptionScreenUiConfig(),
