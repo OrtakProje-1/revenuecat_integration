@@ -184,6 +184,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
           color: isPopular ? theme.popularBadgeBg : Colors.transparent,
+          textStyle: TextStyle(color: theme.popularBadgeText),
           message: isPopular ? uiConfig.popularBadgeText : "",
           location: BannerLocation.topEnd,
           shadow: BoxShadow(
