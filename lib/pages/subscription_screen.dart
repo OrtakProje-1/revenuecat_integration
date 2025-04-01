@@ -172,9 +172,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-            child: Text(
-              uiConfig.packagesLoadingErrorText,
-              style: TextStyle(color: theme.errorColor),
+            child: Column(
+              children: [
+                Icon(Icons.bug_report_outlined, color: theme.errorColor),
+                Text(
+                  uiConfig.packagesLoadingErrorText,
+                  style: TextStyle(color: theme.errorColor),
+                ),
+              ],
             ),
           ),
         ),
