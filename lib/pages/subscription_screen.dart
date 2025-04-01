@@ -169,10 +169,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       return Card(
         elevation: 0,
         color: theme.errorColor?.withAlpha(25),
-        child: Center(
-          child: Text(
-            uiConfig.packagesLoadingErrorText,
-            style: TextStyle(color: theme.errorColor),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Center(
+            child: Text(
+              uiConfig.packagesLoadingErrorText,
+              style: TextStyle(color: theme.errorColor),
+            ),
           ),
         ),
       );
