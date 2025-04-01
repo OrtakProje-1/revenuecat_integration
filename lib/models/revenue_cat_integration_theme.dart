@@ -8,8 +8,8 @@ class RevenueCatIntegrationTheme {
   final Color popularBadgeText;
   final Color trialText;
   final Color saveText;
-  final Color? errorColor;
   final Color? backgroundColor;
+  final Color? errorColor;
 
   RevenueCatIntegrationTheme({
     required this.packageSelectedBg,
@@ -19,8 +19,8 @@ class RevenueCatIntegrationTheme {
     required this.popularBadgeText,
     required this.trialText,
     required this.saveText,
-    required this.errorColor,
     this.backgroundColor,
+    this.errorColor,
   });
 
   static final light = RevenueCatIntegrationTheme(
