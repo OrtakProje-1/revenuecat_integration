@@ -168,7 +168,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     if (isError) {
       return Card(
         elevation: 0,
-        color: theme.errorColor.withAlpha(25),
+        color: theme.errorColor?.withAlpha(25),
         child: Center(
           child: Text(
             uiConfig.packagesLoadingErrorText,

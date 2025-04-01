@@ -8,7 +8,7 @@ class RevenueCatIntegrationTheme {
   final Color popularBadgeText;
   final Color trialText;
   final Color saveText;
-  final Color errorColor;
+  final Color? errorColor;
   final Color? backgroundColor;
 
   RevenueCatIntegrationTheme({
