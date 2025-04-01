@@ -12,6 +12,7 @@ class SubscriptionScreenUiConfig {
   String activePackageText;
   String restorePurchases;
   String specialOfferTitle;
+  String packagesLoadingErrorText;
   List<FeatureItem> features;
   PackagesTextConfig packagesTextConfig;
   SubscriptionScreenBackgroundBuilder? backgroundBuilder;
@@ -27,6 +28,7 @@ class SubscriptionScreenUiConfig {
     this.activePackageText = 'Active package',
     this.restorePurchases = 'Restore purchases',
     this.specialOfferTitle = 'View special offer',
+    this.packagesLoadingErrorText = 'An error occurred while loading packets',
     this.backgroundBuilder,
     this.foregroundBuilder,
     this.editingSavePercentageText = defaultEditingSavePercentageText,

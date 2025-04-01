@@ -8,6 +8,7 @@ class RevenueCatIntegrationTheme {
   final Color popularBadgeText;
   final Color trialText;
   final Color saveText;
+  final Color errorColor;
   final Color? backgroundColor;
 
   RevenueCatIntegrationTheme({
@@ -18,6 +19,7 @@ class RevenueCatIntegrationTheme {
     required this.popularBadgeText,
     required this.trialText,
     required this.saveText,
+    required this.errorColor,
     this.backgroundColor,
   });
 
@@ -29,6 +31,7 @@ class RevenueCatIntegrationTheme {
     popularBadgeText: Colors.white,
     trialText: const Color(0xffe68816),
     saveText: const Color(0xffffea00),
+    errorColor: Colors.red.shade400,
   );
 
   static final dark = RevenueCatIntegrationTheme(
@@ -39,6 +42,7 @@ class RevenueCatIntegrationTheme {
     popularBadgeText: Colors.white,
     trialText: Colors.green,
     saveText: Colors.orange,
+    errorColor: Colors.red.shade800,
   );
 
   RevenueCatIntegrationTheme copyWith({
@@ -50,6 +54,7 @@ class RevenueCatIntegrationTheme {
     Color? trialText,
     Color? saveText,
     Color? backgroundColor,
+    Color? errorColor,
   }) {
     return RevenueCatIntegrationTheme(
       packageSelectedBg: packageSelectedBg ?? this.packageSelectedBg,
@@ -59,6 +64,7 @@ class RevenueCatIntegrationTheme {
       popularBadgeText: popularBadgeText ?? this.popularBadgeText,
       trialText: trialText ?? this.trialText,
       saveText: saveText ?? this.saveText,
+      errorColor: errorColor ?? this.errorColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
@@ -76,6 +82,7 @@ class RevenueCatIntegrationTheme {
       popularBadgeText: Color.lerp(popularBadgeText, other.popularBadgeText, t)!,
       trialText: Color.lerp(trialText, other.trialText, t)!,
       saveText: Color.lerp(saveText, other.saveText, t)!,
+      errorColor: Color.lerp(errorColor, other.errorColor, t)!,
       backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t),
     );
   }

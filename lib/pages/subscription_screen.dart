@@ -166,8 +166,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Widget _buildPackageCards() {
     if (isError) {
-      return const Center(
-        child: Icon(Icons.bug_report_outlined),
+      return Card(
+        elevation: 0,
+        color: theme.errorColor.withAlpha(25),
+        child: Center(
+          child: Text(
+            uiConfig.packagesLoadingErrorText,
+            style: TextStyle(color: theme.errorColor),
+          ),
+        ),
       );
     }
     if (isLoading) {
@@ -184,7 +191,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
           color: isPopular ? theme.popularBadgeBg : Colors.transparent,
-          textStyle: TextStyle(color: theme.popularBadgeText),
+          textStyle: TextStyle(color: theme.popularBadgeText, fontSize: 12),
           message: isPopular ? uiConfig.popularBadgeText : "",
           location: BannerLocation.topEnd,
           shadow: BoxShadow(
