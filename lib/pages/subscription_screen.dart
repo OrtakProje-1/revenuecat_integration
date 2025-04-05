@@ -356,7 +356,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           context.pop(PaywallResult.restored);
         }
       },
-      child: Text(uiConfig.restorePurchases),
+      child: ValueListenableBuilder(
+        valueListenable: restoringPurchases,
+        builder: (context, value, _) {
+          return value ? const CircularProgressIndicator() : Text(uiConfig.restorePurchases);
+        },
+      ),
     );
   }
 
