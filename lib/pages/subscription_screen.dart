@@ -313,7 +313,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           valueListenable: restoringPurchases,
           builder: (context, value, _) {
             return AnimatedOpacity(
-              duration: const Duration(seconds: 2),
+              duration: const Duration(milliseconds: 300),
               opacity: value ? .4 : 1,
               child: ElevatedButton(
                 onPressed: selectedPackage == null
@@ -359,7 +359,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               context.pop(PaywallResult.restored);
             }
           },
-          child: value ? const CircularProgressIndicator() : Text(uiConfig.restorePurchases),
+          child: value ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round)) : Text(uiConfig.restorePurchases),
         );
       },
     );
