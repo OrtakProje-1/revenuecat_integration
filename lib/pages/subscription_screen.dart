@@ -347,21 +347,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   }
 
   Widget _buildFooter() {
-    return TextButton(
-      onPressed: () async {
-        restoringPurchases.value = true;
-        var result = await service.restore();
-        restoringPurchases.value = false;
-        if (result) {
-          context.pop(PaywallResult.restored);
-        }
+    return ValueListenableBuilder(
+      valueListenable: restoringPurchases,
+      builder: (context, value, _) {
+        return TextButton(
+          onPressed: () async {
+            restoringPurchases.value = true;
+            var result = await service.restore();
+            restoringPurchases.value = false;
+            if (result) {
+              context.pop(PaywallResult.restored);
+            }
+          },
+          child: value ? const CircularProgressIndicator() : Text(uiConfig.restorePurchases),
+        );
       },
-      child: ValueListenableBuilder(
-        valueListenable: restoringPurchases,
-        builder: (context, value, _) {
-          return value ? const CircularProgressIndicator() : Text(uiConfig.restorePurchases);
-        },
-      ),
     );
   }
 
