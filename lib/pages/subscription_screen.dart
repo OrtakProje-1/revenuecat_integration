@@ -170,11 +170,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         elevation: 0,
         color: theme.errorColor?.withAlpha(25),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(32.0),
           child: Center(
             child: Column(
               children: [
-                Icon(Icons.bug_report_outlined, color: theme.errorColor),
+                Icon(Icons.warning_amber_rounded, color: theme.errorColor, size: 50),
                 Text(
                   uiConfig.packagesLoadingErrorText,
                   style: TextStyle(color: theme.errorColor),
@@ -323,7 +323,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         try {
                           PaywallResult result = await service.purchase(selectedPackage!);
                           if (!context.mounted || result == PaywallResult.purchased) return;
-                          context.pop(PaywallResult.purchased);
+                          context.pop(result);
                         } catch (e) {
                           context.pop(PaywallResult.error);
                         }
