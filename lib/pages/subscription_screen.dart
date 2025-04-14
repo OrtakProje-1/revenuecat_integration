@@ -359,7 +359,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               context.pop(PaywallResult.restored);
             }
           },
-          child: value ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round)) : Text(uiConfig.restorePurchases),
+          child: value
+              ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round))
+              : Text(
+                  uiConfig.restorePurchases,
+                  style: context.textTheme.bodyMedium,
+                ),
         );
       },
     );

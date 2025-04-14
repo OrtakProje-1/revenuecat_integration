@@ -121,6 +121,7 @@ class RevenueCatIntegrationService {
     var info = await Purchases.restorePurchases();
     var isActive = info.entitlements.all[entitlement]?.isActive ?? false;
     isPremium.value = isActive;
+    activeSubscriptions = info.activeSubscriptions;
     return isActive;
   }
 
