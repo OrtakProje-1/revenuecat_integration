@@ -49,6 +49,7 @@ class RevenueCatIntegrationService {
     await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.error);
     await Purchases.configure(storeConfig.configuration);
     listenCustomerInfo();
+    restore();
   }
 
   /// Listens for customer info updates and updates the [customerInfo] property accordingly.
