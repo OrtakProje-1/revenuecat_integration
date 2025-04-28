@@ -102,6 +102,38 @@ class RevenueCatIntegrationService {
     }
   }
 
+  /// Upgrades the current subscription.
+  ///
+  /// This function is used to upgrade the user's current subscription to a higher tier package.
+  /// For example, upgrading from a monthly subscription to an annual subscription.
+  ///
+  /// The [package] parameter specifies the new package to upgrade to.
+  /// The [entitlementKey] parameter defaults to "premium" and specifies the entitlement
+  /// key to check after the upgrade.
+  ///
+  /// Returns [PaywallResult.purchased] on successful upgrade.
+  /// Returns [PaywallResult.error] in case of any errors.
+  ///
+  Future<PaywallResult> upgradePackage(Package package, {String entitlementKey = "premium"}) async {
+    try {
+      final activePackageDetails = await getActivePackageDetails();
+      if (activePackageDetails.isNull) return PaywallResult.error;
+      final purchaserInfo = await Purchases.purchasePackage(
+        package,
+        googleProductChangeInfo: GoogleProductChangeInfo(
+          activePackageDetails!['productIdentifier']! as String,
+          prorationMode: GoogleProrationMode.immediateAndChargeProratedPrice,
+        ),
+      );
+      var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
+      activeSubscriptions = purchaserInfo.activeSubscriptions;
+      isPremium.value = entitlementInfo?.isActive ?? false;
+      return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
+    } catch (error) {
+      return PaywallResult.error;
+    }
+  }
+
   // Future<bool> purchaseSubscriptionOption(SubscriptionOption option) async {
   //   try {
   //     final CustomerInfo info = await Purchases.purchaseSubscriptionOption(option);
@@ -258,11 +290,7 @@ class RevenueCatIntegrationService {
     final entitlementInfo = customerInfo?.entitlements.all[entitlement];
 
     if (entitlementInfo != null && entitlementInfo.isActive) {
-      return {
-        'package': entitlementInfo.identifier,
-        'expirationDate': entitlementInfo.expirationDate,
-        'willRenew': entitlementInfo.willRenew,
-      };
+      return {'package': entitlementInfo.identifier, 'expirationDate': entitlementInfo.expirationDate, 'willRenew': entitlementInfo.willRenew, 'productIdentifier': entitlementInfo.productIdentifier};
     }
     return null;
   }

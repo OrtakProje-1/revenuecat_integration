@@ -9,6 +9,7 @@ class SubscriptionScreenUiConfig {
   String purchaseButtonTitle;
   String popularBadgeText;
   String includesTitle;
+  String upgradeButtonTitle;
   String activePackageText;
   String restorePurchases;
   String specialOfferTitle;
@@ -25,6 +26,7 @@ class SubscriptionScreenUiConfig {
     this.purchaseButtonTitle = 'Subscribe',
     this.popularBadgeText = 'Popular',
     this.includesTitle = 'Includes',
+    this.upgradeButtonTitle = 'Upgrade package',
     this.activePackageText = 'Active package',
     this.restorePurchases = 'Restore purchases',
     this.specialOfferTitle = 'View special offer',

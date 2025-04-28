@@ -306,6 +306,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   }
 
   Widget _buildSubscribeButton(BuildContext context) {
+    String getButtonTitle() {
+      if (selectedPackage == null) return uiConfig.purchaseButtonTitle;
+      if (service.isPremium.value) return uiConfig.upgradeButtonTitle;
+      if (selectedPackage!.storeProduct.defaultOption.isNotNull && !selectedPackage!.storeProduct.defaultOption!.isBasePlan) return uiConfig.specialOfferTitle;
+      return uiConfig.purchaseButtonTitle;
+    }
+
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -334,12 +341,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text(
-                  (selectedPackage != null && selectedPackage!.storeProduct.defaultOption.isNotNull && !selectedPackage!.storeProduct.defaultOption!.isBasePlan)
-                      ? uiConfig.specialOfferTitle
-                      : uiConfig.purchaseButtonTitle,
-                  style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText),
-                ),
+                child: Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText)),
               ),
             );
           }),
