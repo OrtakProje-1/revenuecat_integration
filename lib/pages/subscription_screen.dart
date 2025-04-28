@@ -322,7 +322,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         if (value) return;
                         try {
                           PaywallResult result = await service.purchase(selectedPackage!);
-                          if (!context.mounted || result == PaywallResult.purchased) return;
+                          if (!context.mounted || result == PaywallResult.cancelled) return;
                           context.pop(result);
                         } catch (e) {
                           context.pop(PaywallResult.error);
