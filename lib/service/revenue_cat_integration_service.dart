@@ -115,23 +115,57 @@ class RevenueCatIntegrationService {
   /// Returns [PaywallResult.error] in case of any errors.
   ///
   Future<PaywallResult> upgradePackage(Package package, {String entitlementKey = "premium"}) async {
+    // try {
+    //   final activePackageDetails = await getActivePackageDetails();
+    //   if (activePackageDetails.isNull) return PaywallResult.error;
+    //   final purchaserInfo = await Purchases.purchasePackage(
+    //     package,
+    //     googleProductChangeInfo: GoogleProductChangeInfo(
+    //       activePackageDetails!['productIdentifier']! as String,
+    //       prorationMode: GoogleProrationMode.immediateAndChargeProratedPrice,
+    //     ),
+    //   );
+    //   var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
+    //   activeSubscriptions = purchaserInfo.activeSubscriptions;
+    //   isPremium.value = entitlementInfo?.isActive ?? false;
+    //   return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
+    // } on PlatformException catch (error) {
+    //   PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
+    //   return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
+    // }
     try {
-      final activePackageDetails = await getActivePackageDetails();
-      if (activePackageDetails.isNull) return PaywallResult.error;
-      final purchaserInfo = await Purchases.purchasePackage(
-        package,
-        googleProductChangeInfo: GoogleProductChangeInfo(
-          activePackageDetails!['productIdentifier']! as String,
-          prorationMode: GoogleProrationMode.immediateAndChargeProratedPrice,
-        ),
-      );
-      var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
-      activeSubscriptions = purchaserInfo.activeSubscriptions;
-      isPremium.value = entitlementInfo?.isActive ?? false;
-      return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
-    } on PlatformException catch (error) {
-      PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
-      return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
+      // 1. Mağaza durumunu kontrol et
+      bool canMakePayments = await Purchases.canMakePayments();
+      if (!canMakePayments) {
+        return PaywallResult.error;
+      }
+      // 2. Mevcut abonelikleri kontrol et
+      CustomerInfo customerInfo = await Purchases.getCustomerInfo();
+      if (customerInfo.entitlements.active.isEmpty) {
+        return PaywallResult.error;
+      }
+      // 3. Satın almaları senkronize et
+      await Purchases.syncPurchases();
+      // 4. Yükseltme işlemini dene
+      await Purchases.purchasePackage(package,
+          googleProductChangeInfo: GoogleProductChangeInfo(
+            customerInfo.entitlements.active.values.first.productIdentifier,
+          ));
+      return PaywallResult.purchased;
+    } on PlatformException catch (e) {
+      PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(e);
+
+      switch (code) {
+        case PurchasesErrorCode.storeProblemError:
+          debugPrint('Mağaza hatası durumunda yeniden deneme');
+          break;
+        case PurchasesErrorCode.purchaseCancelledError:
+          debugPrint('Kullanıcı satın alma işlemini iptal etti');
+          break;
+        default:
+          debugPrint('Hata: ${e.code} - ${e.message}');
+      }
+      return PaywallResult.error;
     }
   }
 
