@@ -129,8 +129,9 @@ class RevenueCatIntegrationService {
       activeSubscriptions = purchaserInfo.activeSubscriptions;
       isPremium.value = entitlementInfo?.isActive ?? false;
       return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
-    } catch (error) {
-      return PaywallResult.error;
+    } on PlatformException catch (error) {
+      PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
+      return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
     }
   }
 

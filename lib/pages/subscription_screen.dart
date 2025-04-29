@@ -328,7 +328,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     : () async {
                         if (value) return;
                         try {
-                          PaywallResult result = await service.purchase(selectedPackage!);
+                          PaywallResult result = service.isPremium.value ? await service.upgradePackage(selectedPackage!) : await service.purchase(selectedPackage!);
                           if (!context.mounted || result == PaywallResult.cancelled) return;
                           context.pop(result);
                         } catch (e) {
