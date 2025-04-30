@@ -186,11 +186,15 @@ class RevenueCatIntegrationService {
   ///
   /// Returns true if the customer is entitled to the provided entitlement, false otherwise.
   Future<bool> restore() async {
-    var info = await Purchases.restorePurchases();
-    var isActive = info.entitlements.all[entitlement]?.isActive ?? false;
-    isPremium.value = isActive;
-    activeSubscriptions = info.activeSubscriptions;
-    return isActive;
+    try {
+      var info = await Purchases.restorePurchases();
+      var isActive = info.entitlements.all[entitlement]?.isActive ?? false;
+      isPremium.value = isActive;
+      activeSubscriptions = info.activeSubscriptions;
+      return isActive;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Returns true if the provided [Package] is the popular one, false otherwise.

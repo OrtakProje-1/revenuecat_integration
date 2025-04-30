@@ -26,6 +26,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   bool isLoading = true;
   bool isError = false;
   ValueNotifier<bool> isBeingPurchased = ValueNotifier(false);
+  ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
   RevenueCatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenueCatIntegrationTheme.dark : RevenueCatIntegrationTheme.light);
   RevenueCatIntegrationService get service => RevenueCatIntegrationService.instance;
@@ -77,9 +78,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      body: SafeArea(
+      body: Container(
+        color: Colors.transparent,
+        constraints: const BoxConstraints.expand(),
         child: Stack(
-          clipBehavior: Clip.none,
           children: [
             if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
             if (uiConfig.backgroundBuilder == null) ...[
@@ -109,7 +111,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             ],
             if (uiConfig.foregroundBuilder.isNull) ...[
               SingleChildScrollView(
-                clipBehavior: Clip.none,
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
@@ -151,17 +152,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 ),
               ),
               Positioned(
-                top: 48,
+                top: 16,
                 left: 16,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.backgroundColor,
+                    color: theme.backgroundColor ?? Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha(100),
-                        blurRadius: 2,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withAlpha(40),
+                        blurRadius: 10,
+                        blurStyle: BlurStyle.outer,
                       ),
                     ],
                   ),
@@ -360,7 +361,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   ),
                 ),
                 child: value
-                    ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round))
+                    ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme.popularBadgeText))
                     : Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText)),
               ),
             );
@@ -370,19 +371,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Widget _buildFooter() {
     return ValueListenableBuilder(
-      valueListenable: isBeingPurchased,
+      valueListenable: isRestoring,
       builder: (context, value, _) {
         return TextButton(
           onPressed: () async {
-            isBeingPurchased.value = true;
-            var result = await service.restore();
-            isBeingPurchased.value = false;
-            if (result) {
-              context.pop(PaywallResult.restored);
+            if (value) return;
+            try {
+              isRestoring.value = true;
+              var result = await service.restore();
+              isRestoring.value = false;
+              if (result) {
+                context.pop(PaywallResult.restored);
+              }
+            } catch (e) {
+              context.pop(PaywallResult.error);
+            } finally {
+              isRestoring.value = false;
             }
           },
           child: value
-              ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round))
+              ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme.popularBadgeBg))
               : Text(
                   uiConfig.restorePurchases,
                   style: context.textTheme.bodyMedium,
