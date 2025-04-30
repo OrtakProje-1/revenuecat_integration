@@ -25,7 +25,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   List<Package> packages = [];
   bool isLoading = true;
   bool isError = false;
-  ValueNotifier<bool> restoringPurchases = ValueNotifier(false);
+  ValueNotifier<bool> isBeingPurchased = ValueNotifier(false);
 
   RevenueCatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenueCatIntegrationTheme.dark : RevenueCatIntegrationTheme.light);
   RevenueCatIntegrationService get service => RevenueCatIntegrationService.instance;
@@ -77,26 +77,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      body: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
-          if (uiConfig.backgroundBuilder == null) ...[
-            Positioned(
-              top: 20,
-              left: 0,
-              child: Opacity(
-                opacity: 0.3,
-                child: LottieWidget(
-                  config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -20,
-              right: 0,
-              child: Transform.rotate(
-                angle: 3.14,
+      body: SafeArea(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
+            if (uiConfig.backgroundBuilder == null) ...[
+              Positioned(
+                top: 20,
+                left: 0,
                 child: Opacity(
                   opacity: 0.3,
                   child: LottieWidget(
@@ -104,62 +93,88 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   ),
                 ),
               ),
-            ),
-          ],
-          if (uiConfig.foregroundBuilder.isNull) ...[
-            SingleChildScrollView(
-              clipBehavior: Clip.none,
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: LottieWidget(
-                        config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenue_cat_integration", repeat: true, size: const Size(250, 250)),
-                      ),
+              Positioned(
+                bottom: -20,
+                right: 0,
+                child: Transform.rotate(
+                  angle: 3.14,
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: LottieWidget(
+                      config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      uiConfig.title,
-                      style: context.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      uiConfig.description,
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    _buildFeaturesList(),
-                    const SizedBox(height: 32),
-                    _buildPackageCards(),
-                    const SizedBox(height: 24),
-                    _buildSubscribeButton(context),
-                    const SizedBox(height: 16),
-                    _buildFooter(),
-                  ],
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 48,
-              left: 16,
-              child: IconButton(
-                icon: Icon(Icons.close, color: theme.trialText),
-                onPressed: () => context.pop(PaywallResult.cancelled),
+            ],
+            if (uiConfig.foregroundBuilder.isNull) ...[
+              SingleChildScrollView(
+                clipBehavior: Clip.none,
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: LottieWidget(
+                          config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenue_cat_integration", repeat: true, size: const Size(250, 250)),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        uiConfig.title,
+                        style: context.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        uiConfig.description,
+                        style: context.textTheme.bodyLarge?.copyWith(
+                          color: Colors.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      _buildFeaturesList(),
+                      const SizedBox(height: 32),
+                      _buildPackageCards(),
+                      const SizedBox(height: 24),
+                      _buildSubscribeButton(context),
+                      const SizedBox(height: 16),
+                      _buildFooter(),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ] else
-            uiConfig.foregroundBuilder!(context, packages, isError, isLoading)
-        ],
+              Positioned(
+                top: 48,
+                left: 16,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.backgroundColor,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 2,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.close, color: theme.trialText),
+                    onPressed: () => context.pop(PaywallResult.cancelled),
+                  ),
+                ),
+              ),
+            ] else
+              uiConfig.foregroundBuilder!(context, packages, isError, isLoading)
+          ],
+        ),
       ),
     );
   }
@@ -317,7 +332,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       width: double.infinity,
       height: 56,
       child: ValueListenableBuilder(
-          valueListenable: restoringPurchases,
+          valueListenable: isBeingPurchased,
           builder: (context, value, _) {
             return AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
@@ -328,11 +343,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     : () async {
                         if (value) return;
                         try {
+                          isBeingPurchased.value = true;
                           PaywallResult result = service.isPremium.value ? await service.upgradePackage(selectedPackage!) : await service.purchase(selectedPackage!);
                           if (!context.mounted || result == PaywallResult.cancelled) return;
                           context.pop(result);
                         } catch (e) {
                           context.pop(PaywallResult.error);
+                        } finally {
+                          isBeingPurchased.value = false;
                         }
                       },
                 style: ElevatedButton.styleFrom(
@@ -341,7 +359,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText)),
+                child: value
+                    ? const SizedBox.square(dimension: 25, child: CircularProgressIndicator.adaptive(strokeCap: StrokeCap.round))
+                    : Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText)),
               ),
             );
           }),
@@ -350,13 +370,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
   Widget _buildFooter() {
     return ValueListenableBuilder(
-      valueListenable: restoringPurchases,
+      valueListenable: isBeingPurchased,
       builder: (context, value, _) {
         return TextButton(
           onPressed: () async {
-            restoringPurchases.value = true;
+            isBeingPurchased.value = true;
             var result = await service.restore();
-            restoringPurchases.value = false;
+            isBeingPurchased.value = false;
             if (result) {
               context.pop(PaywallResult.restored);
             }
