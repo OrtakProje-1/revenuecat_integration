@@ -115,38 +115,16 @@ class RevenueCatIntegrationService {
   /// Returns [PaywallResult.error] in case of any errors.
   ///
   Future<PaywallResult> upgradePackage(Package package, {String entitlementKey = "premium"}) async {
-    // try {
-    //   final activePackageDetails = await getActivePackageDetails();
-    //   if (activePackageDetails.isNull) return PaywallResult.error;
-    //   final purchaserInfo = await Purchases.purchasePackage(
-    //     package,
-    //     googleProductChangeInfo: GoogleProductChangeInfo(
-    //       activePackageDetails!['productIdentifier']! as String,
-    //       prorationMode: GoogleProrationMode.immediateAndChargeProratedPrice,
-    //     ),
-    //   );
-    //   var entitlementInfo = purchaserInfo.entitlements.all[entitlementKey];
-    //   activeSubscriptions = purchaserInfo.activeSubscriptions;
-    //   isPremium.value = entitlementInfo?.isActive ?? false;
-    //   return isPremium.value ? PaywallResult.purchased : PaywallResult.error;
-    // } on PlatformException catch (error) {
-    //   PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(error);
-    //   return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
-    // }
     try {
-      // 1. Mağaza durumunu kontrol et
       bool canMakePayments = await Purchases.canMakePayments();
       if (!canMakePayments) {
         return PaywallResult.error;
       }
-      // 2. Mevcut abonelikleri kontrol et
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       if (customerInfo.entitlements.active.isEmpty) {
         return PaywallResult.error;
       }
-      // 3. Satın almaları senkronize et
       await Purchases.syncPurchases();
-      // 4. Yükseltme işlemini dene
       await Purchases.purchasePackage(package,
           googleProductChangeInfo: GoogleProductChangeInfo(
             customerInfo.entitlements.active.values.first.productIdentifier,
@@ -154,16 +132,15 @@ class RevenueCatIntegrationService {
       return PaywallResult.purchased;
     } on PlatformException catch (e) {
       PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(e);
-
       switch (code) {
         case PurchasesErrorCode.storeProblemError:
-          debugPrint('Mağaza hatası durumunda yeniden deneme');
+          debugPrint('[RevenueCatIntegrationService] Store problem error');
           break;
         case PurchasesErrorCode.purchaseCancelledError:
-          debugPrint('Kullanıcı satın alma işlemini iptal etti');
+          debugPrint('[RevenueCatIntegrationService] Purchase cancelled error');
           break;
         default:
-          debugPrint('Hata: ${e.code} - ${e.message}');
+          debugPrint('[RevenueCatIntegrationService] Error: ${e.code} - ${e.message}');
       }
       return PaywallResult.error;
     }

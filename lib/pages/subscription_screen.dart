@@ -78,28 +78,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
 
     return Scaffold(
       backgroundColor: theme.backgroundColor,
-      body: Container(
-        color: Colors.transparent,
-        constraints: const BoxConstraints.expand(),
-        child: Stack(
-          children: [
-            if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
-            if (uiConfig.backgroundBuilder == null) ...[
-              Positioned(
-                top: 20,
-                left: 0,
-                child: Opacity(
-                  opacity: 0.3,
-                  child: LottieWidget(
-                    config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -20,
-                right: 0,
-                child: Transform.rotate(
-                  angle: 3.14,
+      body: SafeArea(
+        child: Container(
+          color: Colors.transparent,
+          constraints: const BoxConstraints.expand(),
+          child: Stack(
+            children: [
+              if (uiConfig.backgroundBuilder != null) uiConfig.backgroundBuilder!(context, size.height, size.width),
+              if (uiConfig.backgroundBuilder == null) ...[
+                Positioned(
+                  top: 20,
+                  left: 0,
                   child: Opacity(
                     opacity: 0.3,
                     child: LottieWidget(
@@ -107,74 +96,86 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                     ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: -20,
+                  right: 0,
+                  child: Transform.rotate(
+                    angle: 3.14,
+                    child: Opacity(
+                      opacity: 0.3,
+                      child: LottieWidget(
+                        config: LottieWidgetConfig(asset: 'assets/animations/$lottieAsset', package: "revenue_cat_integration", repeat: true, size: const Size(300, 300)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              if (uiConfig.foregroundBuilder.isNull) ...[
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: LottieWidget(
+                            config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenue_cat_integration", repeat: true, size: const Size(250, 250)),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          uiConfig.title,
+                          style: context.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          uiConfig.description,
+                          style: context.textTheme.bodyLarge?.copyWith(
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 32),
+                        _buildFeaturesList(),
+                        const SizedBox(height: 32),
+                        _buildPackageCards(),
+                        const SizedBox(height: 24),
+                        _buildSubscribeButton(context),
+                        const SizedBox(height: 16),
+                        _buildFooter(),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.popularBadgeText,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(40),
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: theme.trialText),
+                      onPressed: () => context.pop(PaywallResult.cancelled),
+                    ),
+                  ),
+                ),
+              ] else
+                uiConfig.foregroundBuilder!(context, packages, isError, isLoading)
             ],
-            if (uiConfig.foregroundBuilder.isNull) ...[
-              SingleChildScrollView(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: LottieWidget(
-                          config: LottieWidgetConfig(asset: 'assets/animations/premium.json', package: "revenue_cat_integration", repeat: true, size: const Size(250, 250)),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        uiConfig.title,
-                        style: context.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        uiConfig.description,
-                        style: context.textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      _buildFeaturesList(),
-                      const SizedBox(height: 32),
-                      _buildPackageCards(),
-                      const SizedBox(height: 24),
-                      _buildSubscribeButton(context),
-                      const SizedBox(height: 16),
-                      _buildFooter(),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 16,
-                left: 16,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.backgroundColor ?? Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(40),
-                        blurRadius: 10,
-                        blurStyle: BlurStyle.outer,
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.close, color: theme.trialText),
-                    onPressed: () => context.pop(PaywallResult.cancelled),
-                  ),
-                ),
-              ),
-            ] else
-              uiConfig.foregroundBuilder!(context, packages, isError, isLoading)
-          ],
+          ),
         ),
       ),
     );
