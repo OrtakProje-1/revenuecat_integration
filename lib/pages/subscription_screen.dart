@@ -7,8 +7,11 @@ import 'package:revenue_cat_integration/models/lottie_widget_config.dart';
 import 'package:revenue_cat_integration/models/revenue_cat_integration_theme.dart';
 import 'package:revenue_cat_integration/util/extensions.dart';
 import 'package:revenue_cat_integration/widgets/feature_item.dart';
+
 import '../service/revenue_cat_integration_service.dart';
 import '../widgets/lottie_widget.dart';
+
+const Color _kColor = Color(0xA0B71C1C);
 
 class SubscriptionScreen extends StatefulWidget {
   final SubscriptionScreenUiConfig? uiConfig;
@@ -28,7 +31,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
   ValueNotifier<bool> isBeingPurchased = ValueNotifier(false);
   ValueNotifier<bool> isRestoring = ValueNotifier(false);
 
-  RevenueCatIntegrationTheme get theme => widget.theme ?? (context.isDarkTheme ? RevenueCatIntegrationTheme.dark : RevenueCatIntegrationTheme.light);
+  RevenueCatIntegrationTheme? get theme => widget.theme;
   RevenueCatIntegrationService get service => RevenueCatIntegrationService.instance;
   SubscriptionScreenUiConfig get uiConfig =>
       widget.uiConfig ??
@@ -77,7 +80,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     var lottieAsset = context.isDarkTheme ? "subscription_bg_dark_animation.json" : "subscription_bg_light_animation.json";
 
     return Scaffold(
-      backgroundColor: theme.backgroundColor,
+      backgroundColor: theme?.backgroundColor,
       body: SafeArea(
         child: Container(
           color: Colors.transparent,
@@ -130,14 +133,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                           uiConfig.title,
                           style: context.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: theme?.titleColor,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           uiConfig.description,
-                          style: context.textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey,
-                          ),
+                          style: context.textTheme.bodyLarge?.copyWith(color: theme?.subTitleColor),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
@@ -157,7 +160,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                   left: 16,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: theme.popularBadgeText,
+                      color: theme?.closeButtonBg,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -167,7 +170,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                       ],
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.close, color: theme.trialText),
+                      icon: Icon(Icons.close, color: theme?.closeButton),
                       onPressed: () => context.pop(PaywallResult.cancelled),
                     ),
                   ),
@@ -185,16 +188,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
     if (isError) {
       return Card(
         elevation: 0,
-        color: theme.errorColor?.withAlpha(25),
+        color: theme?.errorColor?.withAlpha(25),
         child: Padding(
           padding: const EdgeInsets.all(32.0),
           child: Center(
             child: Column(
               children: [
-                Icon(Icons.warning_amber_rounded, color: theme.errorColor, size: 50),
+                Icon(Icons.warning_amber_rounded, color: theme?.errorColor, size: 50),
                 Text(
                   uiConfig.packagesLoadingErrorText,
-                  style: TextStyle(color: theme.errorColor),
+                  style: TextStyle(color: theme?.errorColor),
                 ),
               ],
             ),
@@ -215,8 +218,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
         final (int?, PeriodUnit)? trialDays = service.getTrialDays(package);
         final int? savePercentage = service.getSavePercentage(package, packages);
         final Widget child = Banner(
-          color: isPopular ? theme.popularBadgeBg : Colors.transparent,
-          textStyle: TextStyle(color: theme.popularBadgeText, fontSize: 12),
+          color: isPopular ? theme?.popularBadgeBg ?? _kColor : Colors.transparent,
+          textStyle: TextStyle(color: theme?.popularBadgeText, fontSize: 12),
           message: isPopular ? uiConfig.popularBadgeText : "",
           location: BannerLocation.topEnd,
           shadow: BoxShadow(
@@ -228,10 +231,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             margin: const EdgeInsets.only(bottom: 16),
             padding: const EdgeInsets.only(bottom: 16, left: 16, right: 32, top: 16),
             decoration: BoxDecoration(
-              color: isSelected ? theme.packageSelectedBg : theme.packageUnselectedBg,
+              color: isSelected ? theme?.packageSelectedBg : theme?.packageUnselectedBg,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isSelected ? theme.packageBorderColor : Colors.transparent,
+                color: isSelected ? theme?.packageBorderColor ?? Colors.white : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -239,7 +242,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
               children: [
                 if (!isDisabled)
                   Radio(
-                    activeColor: theme.trialText,
+                    activeColor: theme?.packageRadioColor,
                     value: package,
                     groupValue: selectedPackage,
                     onChanged: (Package? value) {
@@ -254,13 +257,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         _getPackageTitle(package),
                         style: context.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: theme?.packageTextColor,
                         ),
                       ),
                       if (trialDays?.$1 != null)
                         Text(
                           uiConfig.editingTrialDaysText(trialDays!.$1!, trialDays.$2),
                           style: TextStyle(
-                            color: theme.trialText,
+                            color: theme?.trialText,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -270,20 +274,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                 if (isDisabled)
                   Card(
                     elevation: 0,
-                    color: theme.popularBadgeBg,
+                    color: theme?.popularBadgeBg,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       child: Text(
                         uiConfig.activePackageText,
-                        style: TextStyle(color: theme.popularBadgeText),
+                        style: TextStyle(color: theme?.popularBadgeText),
                       ),
                     ),
                   )
                 else
                   Text(
                     package.storeProduct.priceString,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
+                      color: theme?.packageTextColor,
                     ),
                   ),
               ],
@@ -294,8 +299,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
           onTap: isDisabled ? null : () => setState(() => selectedPackage = package),
           child: Badge(
               label: savePercentage != null ? Text(uiConfig.editingSavePercentageText(savePercentage)) : null,
-              backgroundColor: savePercentage != null ? theme.popularBadgeBg : null,
-              textColor: theme.popularBadgeText,
+              backgroundColor: savePercentage != null ? theme?.popularBadgeBg : null,
+              textColor: theme?.popularBadgeText,
               isLabelVisible: savePercentage != null,
               alignment: Alignment.topLeft,
               offset: const Offset(18, -8),
@@ -312,9 +317,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       children: [
         Text(
           uiConfig.includesTitle,
-          style: context.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: theme?.titleColor),
         ),
         const SizedBox(height: 16),
         ...uiConfig.features,
@@ -356,14 +359,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
                         }
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.trialText,
+                  backgroundColor: theme?.purchaseButtonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: value
-                    ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme.popularBadgeText))
-                    : Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme.popularBadgeText)),
+                    ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme?.purchaseButtonColor))
+                    : Text(getButtonTitle(), style: context.textTheme.titleSmall!.copyWith(color: theme?.purchaseButtonTextColor)),
               ),
             );
           }),
@@ -391,10 +394,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
             }
           },
           child: value
-              ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme.popularBadgeBg))
+              ? SizedBox.square(dimension: 25, child: CircularProgressIndicator(strokeCap: StrokeCap.round, color: theme?.purchaseButtonColor))
               : Text(
                   uiConfig.restorePurchases,
-                  style: context.textTheme.bodyMedium,
+                  style: context.textTheme.bodyMedium?.copyWith(color: theme?.subTitleColor),
                 ),
         );
       },

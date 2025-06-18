@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,9 +8,9 @@ import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 import 'package:revenue_cat_integration/configs/subscription_screen_ui_config.dart';
 import 'package:revenue_cat_integration/models/revenue_cat_integration_theme.dart';
 import 'package:revenue_cat_integration/models/store_config.dart';
+import 'package:revenue_cat_integration/pages/subscription_screen.dart';
 import 'package:revenue_cat_integration/util/defines.dart';
 import 'package:revenue_cat_integration/util/extensions.dart';
-import 'package:revenue_cat_integration/pages/subscription_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -132,17 +133,7 @@ class RevenueCatIntegrationService {
       return PaywallResult.purchased;
     } on PlatformException catch (e) {
       PurchasesErrorCode code = PurchasesErrorHelper.getErrorCode(e);
-      switch (code) {
-        case PurchasesErrorCode.storeProblemError:
-          debugPrint('[RevenueCatIntegrationService] Store problem error');
-          break;
-        case PurchasesErrorCode.purchaseCancelledError:
-          debugPrint('[RevenueCatIntegrationService] Purchase cancelled error');
-          break;
-        default:
-          debugPrint('[RevenueCatIntegrationService] Error: ${e.code} - ${e.message}');
-      }
-      return PaywallResult.error;
+      return code == PurchasesErrorCode.purchaseCancelledError ? PaywallResult.cancelled : PaywallResult.error;
     }
   }
 
