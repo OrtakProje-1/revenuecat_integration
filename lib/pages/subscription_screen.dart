@@ -70,7 +70,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> with SingleTick
       debugPrint(e.toString());
     } finally {
       isLoading = false;
-      setState(() {});
+      if (mounted) setState(() {});
     }
   }
 
