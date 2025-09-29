@@ -63,7 +63,6 @@ class RevenueCatIntegrationService {
       customerInfo = info;
       isPremium.value = info.entitlements.all[entitlement]?.isActive ?? false;
       activeSubscriptions = info.activeSubscriptions;
-      debugPrint("--- Customer info updated! ${info.toString()}");
     });
   }
 
